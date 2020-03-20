@@ -33,8 +33,8 @@ class Comment {
 
   Comment.fromJson(Map<String, dynamic> parsedJson) {
     commentsId = parsedJson['_id'];
-    createdAt = parsedJson['createdAt'];
-    updatedAt = parsedJson['updatedAt'];
+    createdAt = DateTime.tryParse(parsedJson["createdAt"]);
+    updatedAt = DateTime.tryParse(parsedJson["updatedAt"]);
     postId = parsedJson['postId'];
     content = parsedJson['commentsContent'];
     profilePhoto = parsedJson['profilePhoto'];

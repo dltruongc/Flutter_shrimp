@@ -14,8 +14,8 @@ class NewFeed {
   // new update
   String title;
 
-  List<Uint8List> images;
-  List<Uint8List> movies;
+  List images;
+  List movies;
   int views;
   int favorites;
 
@@ -40,12 +40,15 @@ class NewFeed {
         this.movies = movies != null ? movies : [];
 
   NewFeed.fromMap(Map<String, dynamic> parsedJson) {
+    print('UPDATE: ${parsedJson['updatedAt']}');
     id = parsedJson['_id'];
     accountId = parsedJson['accountId'];
     newFeedContent = parsedJson['newfeedContent'];
     newFeedLocation = parsedJson['newfeedLocation'];
-    createdAt = DateTime.parse(parsedJson['createdAt']);
-    updatedAt = DateTime.parse(parsedJson['updatedAt']);
+    createdAt = DateTime.tryParse(parsedJson["createdAt"]);
+    updatedAt = parsedJson["updatedAt"] != null
+        ? DateTime.tryParse(parsedJson["updatedAt"])
+        : null;
     title = parsedJson['title'];
     images = parsedJson['images'];
     movies = parsedJson['movies'];
