@@ -34,7 +34,11 @@ class ShrimpPrice {
     sizeId = parsedJson['shrimpSizeId'];
     price = parsedJson["price"];
     shrimpPriceDate = DateTime.tryParse(parsedJson["shrimpPriceDate"]);
-    createdAt = DateTime.tryParse(parsedJson["createdAt"]);
-    updatedAt = DateTime.tryParse(parsedJson["updatedAt"]);
+    createdAt = parsedJson["updatedAt"] != null
+        ? DateTime.tryParse(parsedJson["createdAt"])
+        : null;
+    updatedAt = parsedJson["updatedAt"] != null
+        ? DateTime.tryParse(parsedJson["updatedAt"])
+        : null;
   }
 }

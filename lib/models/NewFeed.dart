@@ -40,12 +40,13 @@ class NewFeed {
         this.movies = movies != null ? movies : [];
 
   NewFeed.fromMap(Map<String, dynamic> parsedJson) {
-    print('UPDATE: ${parsedJson['updatedAt']}');
     id = parsedJson['_id'];
     accountId = parsedJson['accountId'];
     newFeedContent = parsedJson['newfeedContent'];
     newFeedLocation = parsedJson['newfeedLocation'];
-    createdAt = DateTime.tryParse(parsedJson["createdAt"]);
+    createdAt = parsedJson["updatedAt"] != null
+        ? DateTime.tryParse(parsedJson["createdAt"])
+        : null;
     updatedAt = parsedJson["updatedAt"] != null
         ? DateTime.tryParse(parsedJson["updatedAt"])
         : null;

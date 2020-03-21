@@ -6,3 +6,4 @@ const kDeepColor = Color(0xFF012A33);
 const kGradientEndColor = Color(0xff22B1A9);
 const kBodyTextColor = Colors.white;
 const kPrimaryTextSize = 30.0;
+const kServerUrl = 'http://192.168.43.111:3000';

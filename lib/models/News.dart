@@ -30,7 +30,11 @@ class News {
     title = parsedJson['title'];
     url = parsedJson['url'];
     image = null;
-    createdAt = DateTime.tryParse(parsedJson['createdAt']);
-    updatedAt = DateTime.tryParse(parsedJson['updatedAt']);
+    createdAt = parsedJson["updatedAt"] != null
+        ? DateTime.tryParse(parsedJson["createdAt"])
+        : null;
+    updatedAt = parsedJson["updatedAt"] != null
+        ? DateTime.tryParse(parsedJson["updatedAt"])
+        : null;
   }
 }

@@ -5,6 +5,16 @@ class ShrimpSize {
   DateTime createdAt;
   DateTime updatedAt;
 
+  ShrimpSize.fromMap(Map<String, dynamic> map)
+      : id = map['_id'],
+        shrimpSizeQuantity = map['shrimpSizeQuantity'],
+        shrimpSizeUnit = map['shrimpSizeUnit'] ?? '' {
+    createdAt =
+        map["updatedAt"] != null ? DateTime.tryParse(map["createdAt"]) : null;
+    updatedAt =
+        map["updatedAt"] != null ? DateTime.tryParse(map["updatedAt"]) : null;
+  }
+
   ShrimpSize({
     this.id,
     this.shrimpSizeQuantity,
@@ -12,13 +22,6 @@ class ShrimpSize {
     this.createdAt,
     this.updatedAt,
   });
-
-  ShrimpSize.fromMap(Map<String, dynamic> map)
-      : id = map['_id'],
-        shrimpSizeQuantity = map['shrimpSizeQuantity'],
-        shrimpSizeUnit = map['shrimpSizeUnit'] ?? '',
-        createdAt = DateTime.tryParse(map['createdAt']),
-        updatedAt = DateTime.tryParse(map['updatedAt']);
 
   @override
   String toString() {

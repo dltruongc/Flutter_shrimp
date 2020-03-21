@@ -64,8 +64,12 @@ class Account {
         this.birth = DateTime.tryParse(parsedJson['birth'] ?? ''),
         this._password = null,
         this.role = Role.fromInt(parsedJson['roleId']),
-        this.createdAt = DateTime.tryParse(parsedJson["createdAt"]),
-        this.updatedAt = DateTime.tryParse(parsedJson["updatedAt"]) {
+        createdAt = parsedJson["updatedAt"] != null
+            ? DateTime.tryParse(parsedJson["createdAt"])
+            : null,
+        updatedAt = parsedJson["updatedAt"] != null
+            ? DateTime.tryParse(parsedJson["updatedAt"])
+            : null {
     String role = Role.fromInt(parsedJson['roleId']).toString();
 
     if (parsedJson[role] != null) {

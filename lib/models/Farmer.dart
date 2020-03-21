@@ -3,8 +3,8 @@ class Farmer {
   String farmerPhoneNumber;
   String farmerAddress;
   String farmerStory;
-  DateTime createdAt;
-  DateTime updatedAt;
+//  DateTime createdAt;
+//  DateTime updatedAt;
 
   Farmer({
     this.farmerFullname,

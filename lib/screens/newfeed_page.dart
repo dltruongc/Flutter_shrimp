@@ -1,11 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:shrimpapp/components/account_bar.dart';
+import 'package:shrimpapp/components/not_found.dart';
+import 'package:shrimpapp/constants.dart';
 import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/models/NewFeed.dart';
+import 'package:shrimpapp/utils/DateFormatter.dart';
+import 'package:shrimpapp/utils/FetchImage.dart';
 
 final List<NewFeed> newfeeds = [
   NewFeed.fromMap({
     "createdAt": "2020-03-18T13:59:00.996Z",
-    "images": [],
+    "images": ['public/images/a.jpeg', 'public/images/b.jpeg'],
     "updatedAt": "2020-03-18T13:59:00.996Z",
     "movies": [],
     "views": 0,
@@ -18,7 +24,7 @@ final List<NewFeed> newfeeds = [
   }),
   NewFeed.fromMap({
     "createdAt": "2020-03-18T13:59:00.996Z",
-    "images": [],
+    "images": ['xxxxxx'],
     "movies": [],
     "views": 0,
     "updatedAt": "2020-03-18T13:59:00.996Z",
@@ -32,7 +38,7 @@ final List<NewFeed> newfeeds = [
   NewFeed.fromMap({
     "createdAt": "2020-03-18T13:59:00.996Z",
     "updatedAt": "2020-03-18T13:59:00.996Z",
-    "images": [],
+    "images": ['public/images/a.jpeg'],
     "movies": [],
     "views": 0,
     "favorites": 0,
@@ -45,7 +51,7 @@ final List<NewFeed> newfeeds = [
   NewFeed.fromMap({
     "createdAt": "2020-03-18T13:59:00.996Z",
     "updatedAt": "2020-03-18T13:59:00.996Z",
-    "images": [],
+    "images": ['public/images/c.jpeg'],
     "movies": [],
     "views": 0,
     "favorites": 0,
@@ -72,7 +78,7 @@ final List<NewFeed> newfeeds = [
   NewFeed.fromMap({
     "createdAt": "2020-01-14T15:33:06.774Z",
     "updatedAt": "2020-01-14T15:33:06.774Z",
-    "images": [],
+    "images": ['public/images/d.jpg'],
     "movies": [],
     "views": 0,
     "favorites": 0,
@@ -135,13 +141,9 @@ final Account owner = Account.fromJson({
     "farmerPhoneNumber": "0964818307",
     "farmerAddress": "Cần Thơ, Ninh Kiều",
     "farmerStory": "nói gì ai biết đâu à kệ nó đi",
-    "accountId": null,
-    "_id": "5e748f27f5dbc86ace86e9df",
-    "farmerProfilePhoto": "/public/images/received_694254294435388.jpeg",
-    "farmerPhoto": null,
-    "createdAt": "2020-01-12T18:50:20.883Z",
-    "updatedAt": null
   },
+  "profilePhoto": "public/images/a.jpeg",
+  "coverPhoto": null,
   "retailer": null,
   "researcher": null,
   "_id": "5e1b6a6f6df05ba8b30ea62a",
@@ -159,7 +161,7 @@ class NewFeedPage extends StatelessWidget {
         title: Text('Hỏi đáp'),
       ),
       body: ListView.builder(
-          itemCount: 8,
+          itemCount: newfeeds.length,
           itemBuilder: (BuildContext context, int index) {
             return NewFeedItem(
               newFeed: newfeeds[index],
@@ -170,7 +172,7 @@ class NewFeedPage extends StatelessWidget {
   }
 }
 
-class NewFeedItem extends StatelessWidget {
+class NewFeedItem extends StatefulWidget {
   final NewFeed newFeed;
   final Account owner;
 
@@ -178,23 +180,42 @@ class NewFeedItem extends StatelessWidget {
       : super(key: key);
 
   @override
+  _NewFeedItemState createState() => _NewFeedItemState();
+}
+
+class _NewFeedItemState extends State<NewFeedItem> {
+  @override
   Widget build(BuildContext context) {
     return Container(
       child: Column(
         children: <Widget>[
-          ListTile(
-            leading: owner.profilePhoto != null
-                ? Image.network(owner.profilePhoto)
-                : Image.asset('images/person.png'),
-            title: Text(owner.username),
-            subtitle: Column(
+          AccountBar(
+            account: widget.owner,
+            subTitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Text(owner.address),
-                Text(newFeed.createdAt.toIso8601String())
+                Text(widget.newFeed.newFeedLocation ?? ''),
+                Text(DateFormatter.toVietNamString(widget.newFeed.createdAt)),
               ],
             ),
-            isThreeLine: true,
           ),
+          Container(
+            child: Column(
+              children: <Widget>[
+                Text(
+                  widget.newFeed.title,
+                  style: TextStyle(color: Colors.black),
+                ),
+                widget.newFeed.images.length > 0
+                    ? MyNetworkImage.fromPath(path: widget.newFeed.images[0])
+                    : Container(),
+                Text(
+                  widget.newFeed.newFeedContent,
+                  style: TextStyle(color: Colors.black),
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );

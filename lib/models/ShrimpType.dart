@@ -17,7 +17,9 @@ class ShrimpType {
       : id = map['_id'],
         shrimpTypeName = map['shrimpTypeName'],
         shrimpTypeDescription = map['shrimpTypeDescription'] {
-    createdAt = DateTime.tryParse(map["createdAt"]);
-    updatedAt = DateTime.tryParse(map["updatedAt"]);
+    createdAt =
+        map["updatedAt"] != null ? DateTime.tryParse(map["createdAt"]) : null;
+    updatedAt =
+        map["updatedAt"] != null ? DateTime.tryParse(map["updatedAt"]) : null;
   }
 }
