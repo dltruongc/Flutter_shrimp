@@ -66,7 +66,7 @@ class HomePage extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
           ),
-          child: PlayerWidget('http://192.168.43.60:3000/audio'),
+          child: PlayerWidget('http://192.168.43.111:3000/audio'),
         ),
         SizedBox(height: 8.0),
         Expanded(

@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:shrimpapp/models/Comment.dart';
 
 class NewFeed {

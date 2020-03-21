@@ -1,12 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shrimpapp/components/account_bar.dart';
-import 'package:shrimpapp/components/not_found.dart';
-import 'package:shrimpapp/constants.dart';
 import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/models/NewFeed.dart';
 import 'package:shrimpapp/utils/DateFormatter.dart';
-import 'package:shrimpapp/utils/FetchImage.dart';
+import 'package:shrimpapp/widgets/slider_images.dart';
 
 final List<NewFeed> newfeeds = [
   NewFeed.fromMap({
@@ -73,7 +71,7 @@ final List<NewFeed> newfeeds = [
     "newfeedContent": "rwe",
     "newfeedLocation": "Đường Đề Thám, Quận Ninh Kiều, Thành Phố Cần Thơ",
     "updatedAt": "2020-01-14T15:39:30.486Z",
-    "title": "so good"
+    "title": "so good1"
   }),
   NewFeed.fromMap({
     "createdAt": "2020-01-14T15:33:06.774Z",
@@ -186,35 +184,126 @@ class NewFeedItem extends StatefulWidget {
 class _NewFeedItemState extends State<NewFeedItem> {
   @override
   Widget build(BuildContext context) {
+    bool isOverflowContent =
+        widget.newFeed.newFeedContent.length > 50 ? true : false;
     return Container(
       child: Column(
         children: <Widget>[
-          AccountBar(
-            account: widget.owner,
-            subTitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Text(widget.newFeed.newFeedLocation ?? ''),
-                Text(DateFormatter.toVietNamString(widget.newFeed.createdAt)),
-              ],
+          // Account card
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: AccountBar(
+              account: widget.owner,
+              subTitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Text(widget.newFeed.newFeedLocation ?? ''),
+                  Text(
+                    DateFormatter.toVietNamString(widget.newFeed.createdAt),
+                  ),
+                ],
+              ),
             ),
           ),
-          Container(
+
+          // NewFeed content
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Text(
                   widget.newFeed.title,
-                  style: TextStyle(color: Colors.black),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16.0,
+                    letterSpacing: 1.3,
+                  ),
                 ),
-                widget.newFeed.images.length > 0
-                    ? MyNetworkImage.fromPath(path: widget.newFeed.images[0])
-                    : Container(),
                 Text(
                   widget.newFeed.newFeedContent,
-                  style: TextStyle(color: Colors.black),
+                  softWrap: true,
+                  maxLines: isOverflowContent ? 4 : 100,
+                  overflow: isOverflowContent
+                      ? TextOverflow.clip
+                      : TextOverflow.visible,
+                  style: TextStyle(fontSize: 14, color: Colors.black),
                 ),
               ],
             ),
+          ),
+          // Images
+//          widget.newFeed.images.length > 0
+//              ? MyNetworkImage.fromPath(path: widget.newFeed.images[0])
+//              : SizedBox(height: 150.0, width: double.infinity),
+
+          widget.newFeed.images.length > 0
+              ? SliderImages(images: widget.newFeed.images)
+              : SizedBox(),
+          // Interactive post buttons
+          Container(
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: Colors.grey.shade500,
+                  width: 0.5,
+                  style: BorderStyle.solid,
+                ),
+              ),
+            ),
+            margin: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 0.0),
+            height: 32.0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                FlatButton.icon(
+                  padding: const EdgeInsets.all(0.0),
+                  onPressed: () {},
+                  icon: Icon(
+                    FontAwesomeIcons.thumbsUp,
+                    size: 20.0,
+                    color: Colors.black54,
+                  ),
+                  label: Text(
+                    'Quan tâm',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+                FlatButton.icon(
+                  padding: const EdgeInsets.all(0.0),
+                  onPressed: () {},
+                  icon: Icon(
+                    FontAwesomeIcons.commentAlt,
+                    size: 20.0,
+                    color: Colors.black54,
+                  ),
+                  label: Text(
+                    'Bình luận',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+                FlatButton.icon(
+                  padding: const EdgeInsets.all(0.0),
+                  onPressed: () {},
+                  icon: Icon(
+                    FontAwesomeIcons.share,
+                    size: 20.0,
+                    color: Colors.black54,
+                  ),
+                  label: Text(
+                    'Chia sẻ',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Divider(
+            height: 10.0,
+            thickness: 10.0,
+            color: Colors.grey.shade300,
           )
         ],
       ),
