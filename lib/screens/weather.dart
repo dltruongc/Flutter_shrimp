@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:loading_animations/loading_animations.dart';
+import 'package:shrimpapp/components/loading_fullpage.dart';
 import 'package:shrimpapp/secret.dart';
 import 'package:weather/weather.dart';
 
@@ -41,19 +42,8 @@ class _WeatherWidgetState extends State<WeatherWidget> {
       });
     // });
     if (widget.weathers == null) {
-      return Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('images/weather_wall.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Center(
-          child: LoadingBouncingGrid.square(
-            borderColor: Colors.white,
-            backgroundColor: Colors.transparent,
-          ),
-        ),
+      return LoadingScreen(
+        isBackground: true,
       );
     }
 

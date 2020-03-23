@@ -9,5 +9,6 @@ const kBodyTextColor = Colors.white;
 const kDisplayTextColor = Colors.black;
 const kPrimaryTextSize = 30.0;
 final kServerUrl = SecretKeys.serverUrl;
+final kServerApiUrl = kServerUrl + '/api/v1';
 
 enum ValidStatus { OK, ERROR }
