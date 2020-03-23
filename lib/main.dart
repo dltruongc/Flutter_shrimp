@@ -152,6 +152,9 @@ void main() {
       ChangeNotifierProvider(
         create: (context) => NewFeedController(_newFeeds),
         child: MaterialApp(
+          routes: {
+            HomePage.route: (context) => HomePage(),
+          },
           home: MyApp(),
           theme: ThemeData(
             iconTheme: new IconThemeData(

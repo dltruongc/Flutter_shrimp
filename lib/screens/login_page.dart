@@ -8,6 +8,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _emailInput = TextEditingController();
 
   TextEditingController _passWordInput = TextEditingController();
@@ -63,49 +64,61 @@ class _LoginPageState extends State<LoginPage> {
                         blurRadius: 10.0,
                       )
                     ]),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    TextFormField(
-                      controller: _emailInput,
-                      decoration: InputDecoration(
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black12),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      TextFormField(
+                        controller: _emailInput,
+                        validator: (val) {
+                          if (val.length == 0) return "Không được bỏ trống!";
+                          if (val.length < 5)
+                            return "Tên đăng nhập không hợp lệ";
+                          return '';
+                        },
+                        decoration: InputDecoration(
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.black12),
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.green),
+                          ),
+                          filled: false,
+                          prefixIcon: Icon(Icons.account_circle),
+                          labelText: "Tên đăng nhập",
                         ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green),
-                        ),
-                        filled: false,
-                        prefixIcon: Icon(Icons.account_circle),
-                        labelText: "Tên đăng nhập",
-                        errorText: 'ERROR TEXT',
+                        focusNode: _emailFocus,
+                        onFieldSubmitted: (val) {
+                          _emailFocus.unfocus();
+                          FocusScope.of(context).requestFocus(_passwordFocus);
+                        },
                       ),
-                      focusNode: _emailFocus,
-                      onFieldSubmitted: (val) {
-                        _emailFocus.unfocus();
-                        FocusScope.of(context).requestFocus(_passwordFocus);
-                      },
-                    ),
 
-                    // height: ScreenUtil.getInstance().setHeight(50)),
-                    TextFormField(
-                      controller: _passWordInput,
-                      obscureText: !_showPassword,
-                      decoration: InputDecoration(
-                        enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.black12)),
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.green)),
-                        filled: false,
-                        prefixIcon: Icon(Icons.lock),
-                        suffixIcon: _showPasswordFnc(),
-                        labelText: "Mật khẩu",
-                        errorText: 'ERROR TEXT',
+                      // height: ScreenUtil.getInstance().setHeight(50)),
+                      TextFormField(
+                        controller: _passWordInput,
+                        obscureText: !_showPassword,
+                        validator: (val) {
+                          if (val.length == 0) return "Không được bỏ trống!";
+                          if (val.length < 5) return "Mật khẩu quá ngắn";
+                          return '';
+                        },
+                        decoration: InputDecoration(
+                          enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black12)),
+                          focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.green)),
+                          filled: false,
+                          prefixIcon: Icon(Icons.lock),
+                          suffixIcon: _showPasswordFnc(),
+                          labelText: "Mật khẩu",
+                        ),
+                        focusNode: _passwordFocus,
+                        onFieldSubmitted: (val) {},
                       ),
-                      focusNode: _passwordFocus,
-                      onFieldSubmitted: (val) {},
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               SizedBox(
@@ -116,7 +129,9 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      if (_formKey.currentState.validate()) ;
+                    },
                     child: Container(
                       height: 60,
                       width: 240,
@@ -134,10 +149,11 @@ class _LoginPageState extends State<LoginPage> {
                         child: Text(
                           "ĐĂNG NHẬP",
                           style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: "Poppins-Bold",
-                              fontSize: 18,
-                              letterSpacing: 1.0),
+                            color: Colors.white,
+                            fontFamily: "Poppins-Bold",
+                            fontSize: 18,
+                            letterSpacing: 1.0,
+                          ),
                         ),
                       ),
                     ),
@@ -157,7 +173,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   InkWell(
                     onTap: () {
-                      Navigator.pushReplacement(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => RegisterPage(),

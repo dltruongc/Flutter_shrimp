@@ -57,6 +57,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 class HomePage extends StatelessWidget {
+  static const route = '/home';
   @override
   Widget build(BuildContext context) {
     return Column(

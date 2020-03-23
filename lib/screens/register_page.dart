@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shrimpapp/components/image_picker.dart';
 import 'package:shrimpapp/components/submit_button.dart';
+import 'package:shrimpapp/constants.dart';
 import 'package:shrimpapp/widgets/farmer_edit.dart';
 import 'package:shrimpapp/widgets/retailer_edit.dart';
 import '../validation/input_validate.dart';
@@ -33,6 +34,11 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Đăng ký'),
+        centerTitle: true,
+        backgroundColor: kLightColor,
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
@@ -121,11 +127,12 @@ class _RegisterPageState extends State<RegisterPage> {
                         SubmitButton(
                           title: 'Nông dân',
                           onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => FarmerEditorWidget(),
-                              ),
-                            );
+                            if (_formKey.currentState.validate())
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder: (context) => FarmerEditorWidget(),
+                                ),
+                              );
                           },
                           height: 40,
                         ),
@@ -135,11 +142,12 @@ class _RegisterPageState extends State<RegisterPage> {
                         SubmitButton(
                           title: 'Đại lí',
                           onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => RetailerEditorWidget(),
-                              ),
-                            );
+                            if (_formKey.currentState.validate())
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder: (context) => RetailerEditorWidget(),
+                                ),
+                              );
                           },
                           height: 40,
                         ),
