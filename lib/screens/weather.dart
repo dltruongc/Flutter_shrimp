@@ -1,40 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shrimpapp/models/Weather.dart';
-
-final Weather weather = Weather({
-  "coord": {"lon": -0.13, "lat": 51.51},
-  "weather": [
-    {
-      "id": 300,
-      "main": "Drizzle",
-      "description": "light intensity drizzle",
-      "icon": "09d"
-    }
-  ],
-  "base": "stations",
-  "main": {
-    "temp": 280.32,
-    "pressure": 1012,
-    "humidity": 81,
-    "temp_min": 279.15,
-    "temp_max": 281.15
-  },
-  "visibility": 10000,
-  "wind": {"speed": 4.1, "deg": 80},
-  "clouds": {"all": 90},
-  "dt": 1485789600,
-  "sys": {
-    "type": 1,
-    "id": 5091,
-    "message": 0.0103,
-    "country": "GB",
-    "sunrise": 1485762037,
-    "sunset": 1485794875
-  },
-  "id": 2643743,
-  "name": "London",
-  "cod": 200
-});
+import 'package:loading_animations/loading_animations.dart';
+import 'package:shrimpapp/secret.dart';
+import 'package:weather/weather.dart';
 
 List _weekDay = [
   'NO DATA',
@@ -47,11 +14,51 @@ List _weekDay = [
   'Chủ nhật',
 ];
 
-class WeatherWidget extends StatelessWidget {
-  static const path = '/weather';
+class WeatherWidget extends StatefulWidget {
+  WeatherStation weatherStation;
+  List<Weather> weathers;
+  @override
+  _WeatherWidgetState createState() => _WeatherWidgetState();
+}
+
+class _WeatherWidgetState extends State<WeatherWidget> {
+  Weather weather;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    // setState(() {
+    if (widget.weathers == null)
+      WeatherStation(SecretKeys.weather).fiveDayForecast().then((data) {
+        setState(() {
+          print("GERGERGREWRGWEWDEGDSEGSEFSGEFSEFS");
+          widget.weathers = data;
+          weather = data[0];
+        });
+      });
+    else
+      setState(() {
+        weather = widget.weathers[0];
+      });
+    // });
+    if (widget.weathers == null) {
+      return Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('images/weather_wall.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child: LoadingBouncingGrid.square(
+            borderColor: Colors.white,
+            backgroundColor: Colors.transparent,
+          ),
+        ),
+      );
+    }
+
+    return AnimatedContainer(
+      duration: Duration(seconds: 3),
       constraints: BoxConstraints.expand(),
       decoration: BoxDecoration(
         image: DecorationImage(
@@ -134,7 +141,7 @@ class WeatherWidget extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.only(top: 8),
-              itemCount: 10,
+              itemCount: widget.weathers.length,
               itemBuilder: (context, id) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
@@ -142,7 +149,7 @@ class WeatherWidget extends StatelessWidget {
                   children: <Widget>[
                     ListTile(
                       leading: Text(
-                        _weekDay[weather.date.weekday],
+                        _weekDay[widget.weathers[id].date.weekday],
                         style: TextStyle(
                           fontSize: 20,
                           color: Colors.white,
@@ -156,13 +163,13 @@ class WeatherWidget extends StatelessWidget {
                             color: Colors.white,
                           ),
                           Text(
-                            weather.date.hour.toString() + ' giờ',
+                            widget.weathers[id].date.hour.toString() + ' giờ',
                             style: TextStyle(color: Colors.white, fontSize: 20),
                           ),
                         ],
                       ),
                       trailing: Text(
-                        '${weather.temperature.celsius.toStringAsFixed(1)}\u2070C',
+                        '${widget.weathers[id].temperature.celsius.toStringAsFixed(1)}\u2070C',
                         style: TextStyle(
                           fontSize: 20,
                           color: Colors.white,

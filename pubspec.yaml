@@ -21,6 +21,7 @@ dependencies:
   provider: ^4.0.4
   flutter_markdown: ^0.3.4
   rflutter_alert: ^1.0.3
+  weather: ^0.9.6
 
 dev_dependencies:
   flutter_test:
