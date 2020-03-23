@@ -20,71 +20,14 @@ class _RetailerEditorWidgetState extends State<RetailerEditorWidget> {
     TextEditingController _cityCtrl = TextEditingController();
     TextEditingController _websiteCtrl = TextEditingController();
 
-    // Retailer(
-//           retailerName: _fullNameCtrl.text,
-//           retailerAddress: _addressCtrl.text,
-//           retailerEmail: _emailCtrl.text,
-//           retailerWebsite: _websiteCtrl.text,
-//           retailerPhoneNumber: _phoneCtrl.text,
-//           cityName: _cityCtrl.text,
-//         )
-    // Column _retailerBuilder() {
-    //   return Column(
-    //     children: <Widget>[
-    //       RaisedButton(
-    //         child: Text('Thêm ảnh giới thiệu'),
-    //         color: Color(0xff22B1A9),
-    //         onPressed: () {
-    //           // TODO
-    //           _getCoverImage();
-    //         },
-    //       ),
-    //       Container(
-    //         height: 200,
-    //         margin: const EdgeInsets.fromLTRB(16, 8, 0, 0),
-    //         decoration: BoxDecoration(color: Colors.transparent),
-    //         child: Stack(
-    //           children: <Widget>[
-    //             Align(
-    //               alignment: AlignmentDirectional.topCenter,
-    //               child: Container(
-    //                 width: 300,
-    //                 child: Image.asset(
-    //                   'images/person.png',
-    //                   fit: BoxFit.cover,
-    //                   cacheHeight: 640,
-    //                   cacheWidth: 640,
-    //                 ),
-    //               ),
-    //             ),
-    //             Align(
-    //               alignment: AlignmentDirectional.topEnd,
-    //               child: FlatButton.icon(
-    //                 color: Color(0xCC000000),
-    //                 label: Text(
-    //                   'Xoá',
-    //                   style: TextStyle(color: Colors.white),
-    //                 ),
-    //                 icon: Icon(
-    //                   Icons.close,
-    //                   color: Colors.white,
-    //                 ),
-    //                 onPressed: () {
-    //                   setState(() {
-    //                     image;
-    //                   });
-    //                 },
-    //               ),
-    //             ),
-    //           ],
-    //         ),
-    //       ),
-    //       SizedBox(
-    //         height: 30.0,
-    //       ),
-    //     ],
-    //   );
-    // }
+// Retailer(
+//   retailerName: _fullNameCtrl.text,
+//   retailerAddress: _addressCtrl.text,
+//   retailerEmail: _emailCtrl.text,
+//   retailerWebsite: _websiteCtrl.text,
+//   retailerPhoneNumber: _phoneCtrl.text,
+//   cityName: _cityCtrl.text,
+// )
 
     return Scaffold(
       resizeToAvoidBottomPadding: true,
@@ -206,9 +149,6 @@ class _RetailerEditorWidgetState extends State<RetailerEditorWidget> {
       ),
     );
   }
-
-  _getCoverImage() {}
-  File image;
 
   InputDecoration customInputDecoration(String label) {
     return InputDecoration(

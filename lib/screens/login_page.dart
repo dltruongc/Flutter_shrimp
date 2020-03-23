@@ -130,7 +130,9 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   GestureDetector(
                     onTap: () {
-                      if (_formKey.currentState.validate()) ;
+                      // TODO: Login Handle
+                      // if (_formKey.currentState.validate());
+                      // else
                     },
                     child: Container(
                       height: 60,

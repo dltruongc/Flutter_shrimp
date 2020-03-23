@@ -1,10 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shrimpapp/components/submit_button.dart';
 import 'package:shrimpapp/constants.dart';
-import 'package:shrimpapp/screens/home_page.dart';
 import 'package:shrimpapp/validation/input_validate.dart';
 
 class FarmerEditorWidget extends StatefulWidget {
@@ -21,13 +18,12 @@ class _FarmerEditorWidgetState extends State<FarmerEditorWidget> {
     TextEditingController _storyCtrl = TextEditingController();
     TextEditingController _phoneCtrl = TextEditingController();
     TextEditingController _addressCtrl = TextEditingController();
-    String _story;
 
     // Farmer(
     //       farmerFullname: _fullNameCtrl.text,
     //       farmerPhoneNumber: _phoneCtrl.text,
     //       farmerAddress: _addressCtrl.text,
-    //       farmerStory: _story,
+    //       farmerStory: _storyCtrl.text,
     //     )
 
     return Scaffold(
@@ -94,9 +90,6 @@ class _FarmerEditorWidgetState extends State<FarmerEditorWidget> {
                     ),
                     TextField(
                       controller: _storyCtrl,
-                      onChanged: (val) {
-                        _story = val;
-                      },
                       textInputAction: TextInputAction.newline,
                       keyboardType: TextInputType.multiline,
                       enableInteractiveSelection: true,

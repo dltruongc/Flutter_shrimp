@@ -168,7 +168,7 @@ void main() {
               title: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.w500,
-                fontSize: 16.0,
+                fontSize: 18.0,
                 letterSpacing: 1.3,
               ),
               caption: TextStyle(

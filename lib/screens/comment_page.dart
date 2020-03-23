@@ -10,14 +10,6 @@ import 'package:shrimpapp/models/NewFeed.dart';
 import 'package:shrimpapp/utils/DateFormatter.dart';
 import 'package:shrimpapp/widgets/slider_images.dart';
 
-const _text =
-    """Ea magna aliquip ad ullamco reprehenderit dolore nisi commodo. Deserunt deserunt culpa cupidatat consequat anim. Qui cillum elit enim est eiusmod id voluptate laborum aute. Elit anim quis sunt exercitation aliquip proident est cupidatat. Ad eu adipisicing veniam amet consequat qui deserunt sunt incididunt velit. Aliqua commodo id non id reprehenderit eu deserunt qui sint minim velit quis consequat velit. Enim ullamco amet labore labore dolor pariatur Lorem.
-
-In laborum nostrud veniam labore consequat id fugiat anim. Duis aliquip minim cupidatat id incididunt reprehenderit commodo ullamco aute. Ad aute id et sint nulla nulla cillum sunt id anim pariatur incididunt fugiat excepteur. Exercitation nulla commodo incididunt velit reprehenderit proident ad laboris eiusmod duis magna fugiat ut culpa. Voluptate id non consectetur ad laboris reprehenderit in quis irure nostrud non cupidatat do. Id anim excepteur eiusmod tempor ea cillum minim reprehenderit aliqua. Mollit adipisicing sit ea nostrud sunt veniam.
-
-Pariatur sunt laborum do laboris eu non reprehenderit ut anim et incididunt qui. Duis sint exercitation magna dolor irure dolore sint minim tempor velit. Tempor exercitation in proident ad non in. Sunt ea sunt in quis. Magna esse sit aute exercitation irure nisi.
-\n""";
-
 final _sad = Comment.fromJson({
   "createdAt": "2020-01-14T15:41:33.192Z",
   "updatedAt": "2020-01-14T15:41:33.192Z",
@@ -33,19 +25,6 @@ final _sad = Comment.fromJson({
       "Enim **consectetur** consectetur qui ***consequat*** mollit dolor. Adipisicing esse aute ![image](http://192.168.43.111:3000/public/images/axx.jpeg) commodo esse *cillum* minim amet incididunt. Consequat duis ea non consequat cupidatat \n- occaecat \n- irure dolore \n1. dolore cillum occaecat cupidatat enim. \n2. Irure amet nulla in \n3. quis cillum proident fugiat duis duis enim labore minim qui. Eiusmod magna ad consectetur ullamco veniam. Sint laborum ut esse mollit labore consequat. Anim est exercitation aute commodo nulla.",
   "userId": "5dc801d6e01a84c693e64291"
 });
-
-const _dumpText = [
-  _text,
-  _text,
-  _text,
-  _text,
-  _text,
-  _text,
-  _text,
-  _text,
-  _text,
-  _text,
-];
 
 class CommentPage extends StatefulWidget {
   final Account owner;
