@@ -6,8 +6,8 @@ class Comment {
   DateTime updatedAt;
   String postId;
   String content;
-  List<String> images;
-  List<String> movies;
+  List images;
+  List movies;
 
   // Additions
   String profilePhoto;

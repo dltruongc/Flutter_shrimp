@@ -5,8 +5,12 @@ import 'package:shrimpapp/utils/ServerAddress.dart';
 class AccountBar extends StatelessWidget {
   final Account account;
   final Widget subTitle;
+  final bool isThreeLine;
 
-  AccountBar({@required this.account, @required this.subTitle});
+  AccountBar(
+      {@required this.account,
+      @required this.subTitle,
+      this.isThreeLine = true});
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +35,12 @@ class AccountBar extends StatelessWidget {
                 backgroundColor: Colors.red,
               ),
             ),
-      title: Text(account.username),
+      title: Text(
+        account.username,
+        style: Theme.of(context).textTheme.title,
+      ),
       subtitle: subTitle,
-      isThreeLine: true,
+      isThreeLine: isThreeLine,
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:shrimpapp/components/reusable_card.dart';
 import 'package:shrimpapp/constants.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shrimpapp/screens/environment_page.dart';
+import 'package:shrimpapp/screens/login_page.dart';
 import 'package:shrimpapp/screens/newfeed_page.dart';
 import 'package:shrimpapp/screens/news_page.dart';
 import 'package:shrimpapp/screens/weather.dart';
@@ -19,7 +20,7 @@ class _MyAppState extends State<MyApp> {
   final _widgets = [
     WeatherWidget(),
     HomePage(),
-    HomePage(),
+    LoginPage(),
   ];
   @override
   Widget build(BuildContext context) {
@@ -95,7 +96,7 @@ class HomePage extends StatelessWidget {
                                 Icon(Icons.school),
                                 Text(
                                   'Hỏi đáp',
-                                  style: TextStyle(fontSize: kPrimaryTextSize),
+                                  style: Theme.of(context).textTheme.display1,
                                   overflow: TextOverflow.fade,
                                 ),
                               ],
@@ -115,7 +116,7 @@ class HomePage extends StatelessWidget {
                                 Icon(FontAwesomeIcons.leaf),
                                 Text(
                                   'Môi trường',
-                                  style: TextStyle(fontSize: kPrimaryTextSize),
+                                  style: Theme.of(context).textTheme.display1,
                                   overflow: TextOverflow.fade,
                                 ),
                               ],
@@ -143,7 +144,7 @@ class HomePage extends StatelessWidget {
                                 Icon(FontAwesomeIcons.coins),
                                 Text(
                                   'Giá cả',
-                                  style: TextStyle(fontSize: kPrimaryTextSize),
+                                  style: Theme.of(context).textTheme.display1,
                                   overflow: TextOverflow.fade,
                                 ),
                               ],
@@ -165,7 +166,7 @@ class HomePage extends StatelessWidget {
                                 Icon(FontAwesomeIcons.newspaper),
                                 Text(
                                   'Tin tức',
-                                  style: TextStyle(fontSize: kPrimaryTextSize),
+                                  style: Theme.of(context).textTheme.display1,
                                   overflow: TextOverflow.fade,
                                 ),
                               ],
