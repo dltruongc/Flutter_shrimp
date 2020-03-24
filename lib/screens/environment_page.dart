@@ -1,39 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:shrimpapp/components/loading_screen.dart';
+import 'package:shrimpapp/controllers/sensor_controller.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 import '../components/paragraph.dart';
 import '../models/Sensor.dart';
 
-const List parsedJson = [
-  {
-    "created_at": "2020-03-20T00:40:45+07:00",
-    "name": "Nhiệt độ nước (oC)",
-    "parameter": "water-temperature",
-    "value": 29,
-    "unit": "oC"
-  },
-  {
-    "created_at": "2020-03-20T00:40:45+07:00",
-    "name": "Oxy hòa tan (mg/l)",
-    "parameter": "do",
-    "value": 6.58,
-    "unit": "mg/l"
-  },
-  {
-    "created_at": "2020-03-20T00:40:45+07:00",
-    "name": "Độ mặn (ppt)",
-    "parameter": "salinity",
-    "value": 1.97,
-    "unit": "ppt"
-  }
-];
-List<Sensor> sensors = parsedJson.map((item) => Sensor.fromMap(item)).toList();
-final salinity =
-    sensors.firstWhere((sensor) => sensor.type == SensorType.Salinity);
+class EnvironmentPage extends StatefulWidget {
+  List<Sensor> sensors;
+  @override
+  _EnvironmentPageState createState() => _EnvironmentPageState();
+}
 
-class EnvironmentPage extends StatelessWidget {
-  static const path = '/environment';
+class _EnvironmentPageState extends State<EnvironmentPage> {
+  List<Sensor> sensors;
+  dynamic salinity;
   @override
   Widget build(BuildContext context) {
+    if (widget.sensors == null) {
+      SensorController().fetchNew().then((data) {
+        widget.sensors = data;
+        setState(() {
+          sensors = data;
+          salinity = sensors
+              .firstWhere((sensor) => sensor.type == SensorType.Salinity);
+        });
+      });
+    }
+
+    if (sensors == null) {
+      return LoadingScreen();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Môi trường'),

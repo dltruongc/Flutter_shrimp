@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:loading_animations/loading_animations.dart';
-import 'package:shrimpapp/components/loading_fullpage.dart';
+import 'package:shrimpapp/components/loading_screen.dart';
 import 'package:shrimpapp/secret.dart';
 import 'package:weather/weather.dart';
 

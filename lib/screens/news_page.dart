@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:loading_animations/loading_animations.dart';
-import 'package:shrimpapp/components/loading_fullpage.dart';
+import 'package:shrimpapp/components/loading_screen.dart';
 import 'package:shrimpapp/controllers/news_controller.dart';
 import 'package:shrimpapp/models/News.dart';
 import 'package:url_launcher/url_launcher.dart';
