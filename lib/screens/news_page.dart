@@ -8,7 +8,6 @@ import 'package:shrimpapp/models/News.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class NewsPage extends StatefulWidget {
-  List<News> articles = [];
   static const newsRoute = 'newsRoute';
 
   @override
@@ -25,20 +24,19 @@ class _NewsPageState extends State<NewsPage> {
     _isLoading = true;
     _hasMore = true;
 
-    _loadItems();
+    _loadItems(0);
   }
 
-  void _loadItems() {
+  void _loadItems(int index) {
     _isLoading = true;
 
-    NewsController().fetchAll().then((data) {
-      if (data == null) {
+    NewsController().fetchAll(index).then((data) {
+      if (data == null || data.isEmpty) {
         setState(() {
           _isLoading = false;
           _hasMore = false;
         });
       } else {
-        widget.articles.addAll(data);
         setState(() {
           _isLoading = false;
           newsData.addAll(data);
@@ -74,7 +72,7 @@ class _NewsPageState extends State<NewsPage> {
 
           if (id >= newsData.length) {
             if (!_isLoading) {
-              _loadItems();
+              _loadItems(id);
             }
             return Center(child: LoadingFadingLine.circle());
           }

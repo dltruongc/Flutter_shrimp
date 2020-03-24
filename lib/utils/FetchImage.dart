@@ -14,10 +14,11 @@ class MyNetworkImage {
       width = double.infinity}) {
     String url;
 
-    if (path.startsWith("http")) {
-      url = path;
-    } else
+    if (path.startsWith("/")) {
       url = ServerAddress.getUrl(path: path);
+    } else {
+      url = path;
+    }
     return CachedNetworkImage(
       errorWidget: (context, url, err) => Container(
         width: width,

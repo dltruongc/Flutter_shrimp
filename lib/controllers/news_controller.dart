@@ -7,18 +7,25 @@ import 'package:http/http.dart' as http;
 
 class NewsController extends ChangeNotifier {
   static List<News> _articles = [];
-  final int _limit = 10;
+  final int _limit = 20;
 
-  Future<List<News>> fetchAll() async {
+  Future<List<News>> fetchAll(int index) async {
     try {
-      int page = (_articles.length ~/ 10) + 1;
+      int page = (_articles.length ~/ _limit) + 1;
+
+      // Local storage first
+      // If length >= need
+
+      if (index + _limit <= _articles.length) {
+        return _articles.sublist(index, _limit + index);
+      }
       final data = await http
           .get('$kServerApiUrl/news?limit=$_limit&page=$page&sort=-_id');
-      await Future.delayed(Duration(seconds: 3));
       final parsedJson = json.decode(data.body);
       final List<News> results =
           parsedJson['data'].map<News>((e) => News.fromJson(e)).toList();
       _articles.addAll(results);
+
       return results;
     } catch (err) {
       return null;

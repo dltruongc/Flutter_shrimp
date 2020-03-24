@@ -53,7 +53,7 @@ class AccountBar extends StatelessWidget {
               ),
             ),
       title: Text(
-        account.username,
+        account.fullName,
         style: Theme.of(context).textTheme.title,
       ),
       subtitle: subTitle,

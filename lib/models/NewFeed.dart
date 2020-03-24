@@ -1,3 +1,4 @@
+import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/models/Comment.dart';
 
 class NewFeed {
@@ -18,7 +19,7 @@ class NewFeed {
   int favorites;
 
   // Addition
-//  User user;
+  Account user;
 
   NewFeed({
     this.id,

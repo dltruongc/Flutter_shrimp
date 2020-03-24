@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/models/Comment.dart';
 import 'package:shrimpapp/utils/DateFormatter.dart';
 import 'account_bar.dart';
 
 class CommentBox extends StatelessWidget {
-  final Account user;
   final Comment comment;
   final TextEditingController controller;
 
-  CommentBox(this.user, this.comment, {this.controller});
+  CommentBox(this.comment, {this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +23,7 @@ class CommentBox extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           AccountBar(
-            account: user,
+            account: comment.user,
             isThreeLine: false,
             subTitle: Text(
               DateFormatter.toVietNamString(comment.createdAt),
@@ -49,7 +47,8 @@ class CommentBox extends StatelessWidget {
               child: FlatButton.icon(
                 onPressed: () {
                   // TODO: implement reply
-                  controller.text = '**@${user.username}** ${controller.text}';
+                  controller.text =
+                      '**@${comment.user.fullName}** ${controller.text}';
                 },
                 icon: Icon(
                   Icons.reply,

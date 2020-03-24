@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:loading_animations/loading_animations.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shrimpapp/components/account_bar.dart';
 import 'package:shrimpapp/components/comment_box.dart';
+import 'package:shrimpapp/controllers/comment_controller.dart';
 import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/models/Comment.dart';
 import 'package:shrimpapp/models/NewFeed.dart';
@@ -27,17 +29,45 @@ final _sad = Comment.fromJson({
 });
 
 class CommentPage extends StatefulWidget {
-  final Account owner;
   final NewFeed newFeed;
-  final List<Comment> comments;
 
-  CommentPage(this.owner, this.newFeed, this.comments);
+  CommentPage(this.newFeed);
 
   @override
   _CommentPageState createState() => _CommentPageState();
 }
 
 class _CommentPageState extends State<CommentPage> {
+  List<Comment> comments = [];
+  bool _hasMore = true;
+  bool _isLoading = true;
+  CommentController commentController = CommentController();
+  @override
+  void initState() {
+    _hasMore = true;
+    _isLoading = true;
+
+    super.initState();
+    _loadItem();
+  }
+
+  void _loadItem() {
+    _isLoading = true;
+    commentController.fetchComment(widget.newFeed.id).then((data) {
+      if (data == null || data.isEmpty) {
+        setState(() {
+          _isLoading = false;
+          _hasMore = false;
+        });
+      } else {
+        _isLoading = false;
+        setState(() {
+          comments.addAll(data);
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     TextEditingController cmtController = TextEditingController();
@@ -50,7 +80,7 @@ class _CommentPageState extends State<CommentPage> {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               children: <Widget>[
                 AccountBar(
-                  account: widget.owner,
+                  account: widget.newFeed.user,
                   subTitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
@@ -87,10 +117,22 @@ class _CommentPageState extends State<CommentPage> {
                   thickness: 0.8,
                   color: Colors.black38,
                 ),
-                ...widget.comments.map(
-                  (cmt) =>
-                      CommentBox(widget.owner, cmt, controller: cmtController),
-                )
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _hasMore ? comments.length + 1 : comments.length,
+                  itemBuilder: (context, id) {
+                    if (id >= comments.length) {
+                      if (!_isLoading) {
+                        _loadItem();
+                      }
+                      return Center(child: LoadingFadingLine.circle());
+                    }
+                    if (_hasMore && _isLoading) {
+                      return LoadingFadingLine.circle();
+                    }
+                    return CommentBox(comments[id], controller: cmtController);
+                  },
+                ),
               ],
             ),
             // Enter comment
@@ -145,7 +187,7 @@ class _CommentPageState extends State<CommentPage> {
                           ).show();
                         }
                         setState(() {
-                          this.widget.comments.insert(0, _sad);
+                          comments.insert(0, _sad);
                         });
                       },
                     ),

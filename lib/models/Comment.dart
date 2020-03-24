@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:shrimpapp/models/Account.dart';
 
 class Comment {
-  String commentsId;
+  String id;
   DateTime createdAt;
   DateTime updatedAt;
   String postId;
@@ -13,17 +14,18 @@ class Comment {
   String profilePhoto;
   String userFullName;
   String userId;
+  Account user;
 
   Comment(
       {commentsContent,
-      commentsId,
+      id,
       movies,
       images,
       postId,
       this.profilePhoto,
       this.userFullName,
       @required this.userId})
-      : this.commentsId = commentsId,
+      : this.id = id,
         this.content = commentsContent,
         this.createdAt = DateTime.now(),
         this.updatedAt = DateTime.now(),
@@ -32,7 +34,7 @@ class Comment {
         this.postId = postId;
 
   Comment.fromJson(Map<String, dynamic> parsedJson) {
-    commentsId = parsedJson['_id'];
+    id = parsedJson['_id'];
     createdAt = parsedJson["updatedAt"] != null
         ? DateTime.tryParse(parsedJson["createdAt"])
         : null;
