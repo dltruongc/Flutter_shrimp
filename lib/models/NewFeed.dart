@@ -12,8 +12,8 @@ class NewFeed {
   // new update
   String title;
 
-  List images;
-  List movies;
+  List<String> images;
+  List<String> movies;
   int views;
   int favorites;
 
@@ -49,8 +49,12 @@ class NewFeed {
         ? DateTime.tryParse(parsedJson["updatedAt"])
         : null;
     title = parsedJson['title'];
-    images = parsedJson['images'];
-    movies = parsedJson['movies'];
+    images = parsedJson['images'].isNotEmpty
+        ? parsedJson['images'].map<String>((e) => e.toString()).toList()
+        : [];
+    movies = parsedJson['movies'].isNotEmpty
+        ? parsedJson['movies'].map<String>((e) => e.toString()).toList()
+        : [];
     views = parsedJson['views'];
     favorites = parsedJson['favorites'];
     comments = [];

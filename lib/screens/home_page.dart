@@ -4,6 +4,7 @@ import 'package:shrimpapp/constants.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/screens/environment_page.dart';
+import 'package:shrimpapp/screens/favorite_page.dart';
 import 'package:shrimpapp/screens/newfeed_page.dart';
 import 'package:shrimpapp/screens/news_page.dart';
 import 'package:shrimpapp/screens/profile_page.dart';
@@ -16,32 +17,12 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-final Account _account = Account.fromJson({
-  "createdAt": "2020-01-12T18:50:20.883Z",
-  "updatedAt": "2020-01-12T18:50:20.883Z",
-  "farmer": {
-    "farmerFullname": "Đỗ Lam Trường",
-    "farmerPhoneNumber": "0964818307",
-    "farmerAddress": "Cần Thơ, Ninh Kiều",
-    "farmerStory": "nói gì ai biết đâu à kệ nó đi",
-  },
-  "profilePhoto": "/public/images/a.jpeg",
-  "coverPhoto": null,
-  "retailer": null,
-  "researcher": null,
-  "_id": "5e1b6a6f6df05ba8b30ea62a",
-  "accountUserName": "dltruong",
-  "isMale": null,
-  "birth": null,
-  "roleId": 1
-});
-
 class _MyAppState extends State<MyApp> {
   int _currentIndex = 1;
   final _widgets = [
     WeatherWidget(),
     HomePage(),
-    AccountInfo(_account),
+    FavoritePage(),
   ];
   @override
   Widget build(BuildContext context) {

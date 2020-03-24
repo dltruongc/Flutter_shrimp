@@ -3,8 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:provider/provider.dart';
 import 'package:shrimpapp/components/account_bar.dart';
-import 'package:shrimpapp/components/loading_screen.dart';
 import 'package:shrimpapp/constants.dart';
+import 'package:shrimpapp/controllers/favorite_controller.dart';
 import 'package:shrimpapp/controllers/newfeed_controller.dart';
 import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/models/Comment.dart';
@@ -334,34 +334,30 @@ final List<NewFeed> _addThis = [
   })
 ];
 
-class NewFeedPage extends StatelessWidget {
+class FavoritePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Hỏi đáp'),
       ),
-      body: Consumer<NewFeedController>(
+      body: Consumer<FavoriteController>(
           child: LoadingBouncingGrid.square(
             backgroundColor: kLightColor,
           ),
           builder: (context, controller, _) {
-            if (controller.length <= 0) {
-              Provider.of<NewFeedController>(context, listen: false).fetchTop();
-            }
-            print(controller.length);
             final List<NewFeed> newfeeds = controller.getAll();
             return RefreshIndicator(
               // TODO: dummy data
               onRefresh: () async {
                 await Future.delayed(Duration(seconds: 3));
-                Provider.of<NewFeedController>(context, listen: false)
+                Provider.of<FavoriteController>(context, listen: false)
                     .addFirst(_addThis);
               },
               child: ListView.builder(
                 itemCount: newfeeds.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return NewFeedItem(
+                  return FavoriteItem(
                     newFeed: newfeeds[index],
                     // FIXME: newfeed owner
                     owner: owner,
@@ -374,18 +370,18 @@ class NewFeedPage extends StatelessWidget {
   }
 }
 
-class NewFeedItem extends StatefulWidget {
+class FavoriteItem extends StatefulWidget {
   final NewFeed newFeed;
   final Account owner;
 
-  NewFeedItem({Key key, @required this.newFeed, @required this.owner})
+  FavoriteItem({Key key, @required this.newFeed, @required this.owner})
       : super(key: key);
 
   @override
-  _NewFeedItemState createState() => _NewFeedItemState();
+  _FavoriteItemState createState() => _FavoriteItemState();
 }
 
-class _NewFeedItemState extends State<NewFeedItem> {
+class _FavoriteItemState extends State<FavoriteItem> {
   @override
   Widget build(BuildContext context) {
     bool isOverflowContent =
@@ -410,7 +406,7 @@ class _NewFeedItemState extends State<NewFeedItem> {
             ),
           ),
 
-          // NewFeed content
+          // Favorite content
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Column(

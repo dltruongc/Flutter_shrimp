@@ -6,49 +6,54 @@ import 'package:shrimpapp/models/News.dart';
 import 'package:http/http.dart' as http;
 
 class NewsController extends ChangeNotifier {
-  List<News> _articles = [];
+  static List<News> _articles = [];
+  final int _limit = 10;
 
   Future<List<News>> fetchAll() async {
     try {
-      final data = await http.get('$kServerApiUrl/news');
+      int page = (_articles.length ~/ 10) + 1;
+      final data = await http
+          .get('$kServerApiUrl/news?limit=$_limit&page=$page&sort=-_id');
+      await Future.delayed(Duration(seconds: 3));
       final parsedJson = json.decode(data.body);
       final List<News> results =
           parsedJson['data'].map<News>((e) => News.fromJson(e)).toList();
+      _articles.addAll(results);
       return results;
     } catch (err) {
       return null;
     }
   }
 
-  NewsController({List<News> articles}) : this._articles = articles;
+  NewsController();
 
   void addFirst(Iterable<News> items) {
-    this._articles.insertAll(0, items);
+    _articles.insertAll(0, items);
     notifyListeners();
   }
 
   void set(List<News> items) {
-    this._articles = [...items];
+    _articles = [...items];
     notifyListeners();
   }
 
   void removeFirst() {
-    if (this._articles.length > 0) {
-      this._articles.removeAt(0);
+    if (_articles.length > 0) {
+      _articles.removeAt(0);
     }
     notifyListeners();
   }
 
   void removeLast() {
-    if (this._articles.length > 0) {
-      this._articles.removeAt(this._articles.length - 1);
+    if (_articles.length > 0) {
+      _articles.removeAt(_articles.length - 1);
     }
     notifyListeners();
   }
 
   void removeMany(int start, int end) {
-    this._articles.removeRange(start, end);
+    _articles.removeRange(start, end);
   }
 
-  List<News> getAll() => [...this._articles];
+  List<News> getAll() => [..._articles];
 }

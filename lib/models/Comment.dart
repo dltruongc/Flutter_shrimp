@@ -6,8 +6,8 @@ class Comment {
   DateTime updatedAt;
   String postId;
   String content;
-  List images;
-  List movies;
+  List<String> images;
+  List<String> movies;
 
   // Additions
   String profilePhoto;
@@ -44,8 +44,12 @@ class Comment {
     profilePhoto = parsedJson['profilePhoto'];
     userFullName = parsedJson['userFullName'];
     userId = parsedJson['userId'];
-    images = parsedJson['images'];
-    movies = parsedJson['movies'];
+    images = parsedJson['images'].isNotEmpty
+        ? parsedJson['images'].map<String>((e) => e.toString()).toList()
+        : [];
+    movies = parsedJson['movies'].isNotEmpty
+        ? parsedJson['movies'].map<String>((e) => e.toString()).toList()
+        : [];
   }
 
   Map<String, dynamic> toMap() {

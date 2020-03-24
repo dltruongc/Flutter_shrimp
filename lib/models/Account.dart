@@ -59,7 +59,9 @@ class Account {
       : this.id = parsedJson['_id'],
         this.username = parsedJson['accountUserName'],
         this.isMale = parsedJson['isMale'],
-        this.birth = DateTime.tryParse(parsedJson['birth'] ?? ''),
+        this.birth = parsedJson['birth'] != null
+            ? DateTime.tryParse(parsedJson['birth'])
+            : null,
         this._password = null,
         this.role = Role.fromInt(parsedJson['roleId']),
         createdAt = parsedJson["updatedAt"] != null

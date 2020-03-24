@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:loading_animations/loading_animations.dart';
+import 'package:provider/provider.dart';
 import 'package:shrimpapp/components/loading_screen.dart';
 import 'package:shrimpapp/controllers/news_controller.dart';
 import 'package:shrimpapp/models/News.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class NewsPage extends StatefulWidget {
-  List<News> articles;
+  List<News> articles = [];
   static const newsRoute = 'newsRoute';
 
   @override
@@ -14,18 +16,46 @@ class NewsPage extends StatefulWidget {
 }
 
 class _NewsPageState extends State<NewsPage> {
-  List<News> newsData;
+  bool _isLoading = true;
+  bool _hasMore = true;
+  @override
+  void initState() {
+    super.initState();
+
+    _isLoading = true;
+    _hasMore = true;
+
+    _loadItems();
+  }
+
+  void _loadItems() {
+    _isLoading = true;
+
+    NewsController().fetchAll().then((data) {
+      if (data == null) {
+        setState(() {
+          _isLoading = false;
+          _hasMore = false;
+        });
+      } else {
+        widget.articles.addAll(data);
+        setState(() {
+          _isLoading = false;
+          newsData.addAll(data);
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  List<News> newsData = [];
   @override
   Widget build(BuildContext context) {
-    if (widget.articles == null) {
-      NewsController().fetchAll().then((data) {
-        widget.articles = data;
-        setState(() {
-          newsData = data;
-        });
-      });
-    }
-    if (newsData == null) {
+    if (newsData.length == 0) {
       return LoadingScreen();
     }
     return Scaffold(
@@ -33,14 +63,20 @@ class _NewsPageState extends State<NewsPage> {
         title: Text('Tin tức'),
       ),
       body: ListView.builder(
-        itemCount: newsData.length,
+        itemCount: _hasMore ? newsData.length + 1 : newsData.length,
         itemBuilder: (ctx, id) {
           _launchURL() async {
-            print('${newsData[id].url}');
             final url = newsData[id].url;
             if (await canLaunch(url)) {
               await launch(url);
             }
+          }
+
+          if (id >= newsData.length) {
+            if (!_isLoading) {
+              _loadItems();
+            }
+            return Center(child: LoadingFadingLine.circle());
           }
 
           return GestureDetector(
