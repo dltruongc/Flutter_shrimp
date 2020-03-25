@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shrimpapp/controllers/favorite_controller.dart';
 import 'package:shrimpapp/controllers/newfeed_controller.dart';
 
 import 'constants.dart';
@@ -16,8 +17,15 @@ void main() {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
     runApp(
-      ChangeNotifierProvider(
-        create: (context) => NewFeedController(),
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => NewFeedController(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => FavoriteController(),
+          ),
+        ],
         child: MaterialApp(
           routes: {
             HomePage.route: (context) => HomePage(),

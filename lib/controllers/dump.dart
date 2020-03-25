@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:shrimpapp/models/ShrimpPrice.dart';
 import 'package:shrimpapp/models/ShrimpType.dart';
 
 x() async {

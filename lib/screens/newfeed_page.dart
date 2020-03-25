@@ -17,6 +17,7 @@ class NewFeedPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Hỏi đáp'),
+        centerTitle: true,
       ),
       body: Consumer<NewFeedController>(builder: (context, controller, _) {
         if (controller.length <= 0) {
@@ -34,7 +35,7 @@ class NewFeedPage extends StatelessWidget {
             itemCount:
                 controller.hasMore ? newfeeds.length + 1 : controller.length,
             itemBuilder: (BuildContext context, int index) {
-              if (index == newfeeds.length && controller.hasMore) {
+              if (index >= newfeeds.length && controller.hasMore) {
                 Provider.of<NewFeedController>(context, listen: false)
                     .fetchTop();
                 return LoadingFadingLine.circle();
@@ -98,14 +99,17 @@ class _NewFeedItemState extends State<NewFeedItem> {
                   widget.newFeed.title,
                   style: Theme.of(context).textTheme.title,
                 ),
-                Text(
-                  widget.newFeed.newFeedContent,
-                  softWrap: true,
-                  maxLines: isOverflowContent ? 4 : 100,
-                  overflow: isOverflowContent
-                      ? TextOverflow.clip
-                      : TextOverflow.visible,
-                  style: TextStyle(fontSize: 14.0, color: Colors.black),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  child: Text(
+                    widget.newFeed.newFeedContent,
+                    softWrap: true,
+                    maxLines: isOverflowContent ? 4 : 100,
+                    overflow: isOverflowContent
+                        ? TextOverflow.clip
+                        : TextOverflow.visible,
+                    style: TextStyle(fontSize: 14.0, color: Colors.black),
+                  ),
                 ),
               ],
             ),
