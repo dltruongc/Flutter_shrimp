@@ -6,6 +6,7 @@ import 'package:shrimpapp/controllers/favorite_controller.dart';
 import 'package:shrimpapp/models/NewFeed.dart';
 import 'package:shrimpapp/screens/newfeed_page.dart';
 
+// FIXME: dump account id
 String _dumpAccountId = "5e71f11bfbb5942d4031b0c0";
 
 class FavoritePage extends StatelessWidget {
@@ -14,7 +15,7 @@ class FavoritePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Hỏi đáp'),
+        title: Text('Quan tâm'),
         centerTitle: true,
       ),
       body: Consumer<FavoriteController>(builder: (context, controller, _) {
@@ -36,6 +37,7 @@ class FavoritePage extends StatelessWidget {
               }
               return NewFeedItem(
                 newFeed: newfeeds[index],
+                like: true,
                 owner: newfeeds[index].user,
               );
             },

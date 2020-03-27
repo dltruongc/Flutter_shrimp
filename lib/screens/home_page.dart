@@ -25,10 +25,6 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text('Trang chủ'),
-      ),
       body: _widgets[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: [
@@ -60,136 +56,146 @@ class HomePage extends StatelessWidget {
   static const route = '/home';
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        // FIXME: Audio player widget implement
-        Container(
-          height: 180.0,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Trang chủ'),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: <Widget>[
+          // FIXME: Audio player widget implement
+          Container(
+            height: 180.0,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: PlayerWidget('$kServerUrl/audio'),
           ),
-          child: PlayerWidget('http://192.168.43.111:3000/audio'),
-        ),
-        SizedBox(height: 8.0),
-        Expanded(
+          SizedBox(height: 8.0),
+          Expanded(
 //            height: MediaQuery.of(context).size.height - 180,
-          child: SingleChildScrollView(
-            child: Container(
-              height: 400,
-              constraints: BoxConstraints(
-                minHeight: 350,
-                maxHeight: 350,
-                minWidth: 350,
-                maxWidth: double.infinity,
-              ),
-              child: Column(
-                children: <Widget>[
-                  Expanded(
-                    child: Row(
-                      children: <Widget>[
-                        SizedBox(width: 8.0),
-                        Expanded(
-                          child: ReusableCard(
-                            colour: kLightColor,
-                            cardChild: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: <Widget>[
-                                Icon(Icons.school),
-                                Text(
-                                  'Hỏi đáp',
-                                  style: Theme.of(context).textTheme.display1,
-                                  overflow: TextOverflow.fade,
-                                ),
-                              ],
+            child: SingleChildScrollView(
+              child: Container(
+                height: 400,
+                constraints: BoxConstraints(
+                  minHeight: 350,
+                  maxHeight: 350,
+                  minWidth: 350,
+                  maxWidth: double.infinity,
+                ),
+                child: Column(
+                  children: <Widget>[
+                    Expanded(
+                      child: Row(
+                        children: <Widget>[
+                          SizedBox(width: 8.0),
+                          Expanded(
+                            child: ReusableCard(
+                              colour: kLightColor,
+                              cardChild: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: <Widget>[
+                                  Icon(Icons.school),
+                                  Text(
+                                    'Hỏi đáp',
+                                    style: Theme.of(context).textTheme.display1,
+                                    overflow: TextOverflow.fade,
+                                  ),
+                                ],
+                              ),
+                              onPress: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => NewFeedPage()));
+                              },
                             ),
-                            onPress: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => NewFeedPage()));
-                            },
                           ),
-                        ),
-                        Expanded(
-                          child: ReusableCard(
-                            colour: kLightColor,
-                            cardChild: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: <Widget>[
-                                Icon(FontAwesomeIcons.leaf),
-                                Text(
-                                  'Môi trường',
-                                  style: Theme.of(context).textTheme.display1,
-                                  overflow: TextOverflow.fade,
-                                ),
-                              ],
+                          Expanded(
+                            child: ReusableCard(
+                              colour: kLightColor,
+                              cardChild: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: <Widget>[
+                                  Icon(FontAwesomeIcons.leaf),
+                                  Text(
+                                    'Môi trường',
+                                    style: Theme.of(context).textTheme.display1,
+                                    overflow: TextOverflow.fade,
+                                  ),
+                                ],
+                              ),
+                              onPress: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => EnvironmentPage()));
+                              },
                             ),
-                            onPress: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => EnvironmentPage()));
-                            },
                           ),
-                        ),
-                        SizedBox(width: 8.0),
-                      ],
+                          SizedBox(width: 8.0),
+                        ],
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      children: <Widget>[
-                        SizedBox(width: 8.0),
-                        Expanded(
-                          child: ReusableCard(
-                            colour: kLightColor,
-                            cardChild: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: <Widget>[
-                                Icon(FontAwesomeIcons.coins),
-                                Text(
-                                  'Giá cả',
-                                  style: Theme.of(context).textTheme.display1,
-                                  overflow: TextOverflow.fade,
-                                ),
-                              ],
+                    Expanded(
+                      child: Row(
+                        children: <Widget>[
+                          SizedBox(width: 8.0),
+                          Expanded(
+                            child: ReusableCard(
+                              colour: kLightColor,
+                              cardChild: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: <Widget>[
+                                  Icon(FontAwesomeIcons.coins),
+                                  Text(
+                                    'Giá cả',
+                                    style: Theme.of(context).textTheme.display1,
+                                    overflow: TextOverflow.fade,
+                                  ),
+                                ],
+                              ),
+                              onPress: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (context) => PricePage()),
+                                );
+                              },
                             ),
-                            onPress: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (context) => PricePage()),
-                              );
-                            },
                           ),
-                        ),
-                        Expanded(
-                          child: ReusableCard(
-                            colour: kLightColor,
-                            cardChild: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: <Widget>[
-                                Icon(FontAwesomeIcons.newspaper),
-                                Text(
-                                  'Tin tức',
-                                  style: Theme.of(context).textTheme.display1,
-                                  overflow: TextOverflow.fade,
-                                ),
-                              ],
+                          Expanded(
+                            child: ReusableCard(
+                              colour: kLightColor,
+                              cardChild: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: <Widget>[
+                                  Icon(FontAwesomeIcons.newspaper),
+                                  Text(
+                                    'Tin tức',
+                                    style: Theme.of(context).textTheme.display1,
+                                    overflow: TextOverflow.fade,
+                                  ),
+                                ],
+                              ),
+                              onPress: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (context) => NewsPage()),
+                                );
+                              },
                             ),
-                            onPress: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (context) => NewsPage()),
-                              );
-                            },
                           ),
-                        ),
-                        SizedBox(width: 8.0),
-                      ],
+                          SizedBox(width: 8.0),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

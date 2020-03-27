@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shrimpapp/controllers/auth_controller.dart';
 import 'package:shrimpapp/controllers/favorite_controller.dart';
 import 'package:shrimpapp/controllers/newfeed_controller.dart';
 
@@ -24,6 +25,9 @@ void main() {
           ),
           ChangeNotifierProvider(
             create: (context) => FavoriteController(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => AuthController(),
           ),
         ],
         child: MaterialApp(

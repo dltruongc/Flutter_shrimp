@@ -13,8 +13,8 @@ class NewFeed {
   // new update
   String title;
 
-  List<String> images;
-  List<String> movies;
+  List images;
+  List movies;
   int views;
   int favorites;
 
@@ -61,9 +61,8 @@ class NewFeed {
     comments = [];
   }
 
-  Map<String, dynamic> toMap() {
+  Map toMap() {
     Map<String, dynamic> result = {
-      '_id': this.id,
       'accountId': this.accountId,
       'newfeedContent': this.newFeedContent,
       'newfeedLocation': this.newFeedLocation,
