@@ -2,28 +2,32 @@ import 'package:flutter/foundation.dart';
 import 'package:shrimpapp/models/Account.dart';
 
 class AuthController extends ChangeNotifier {
+  // FIXME: dump owner
   static Account _owner = Account.fromJson({
-    "isMale": false,
-    "birth": "2019-08-06T17:00:00.000Z",
-    "createdAt": "2019-10-12T17:00:00.000Z",
-    "updatedAt": "2019-12-02T17:00:00.000Z",
-    "profilePhoto":
-        "https://robohash.org/occaecatiquisunt.jpg?size=50x50&set=set1",
-    "coverPhoto": "http://dummyimage.com/191x109.png/ff4444/ffffff",
+    "_id": "5e7d9468f715b13067a30f66",
+    "isMale": null,
+    "birth": null,
+    "createdAt": "2020-03-27T02:42:18.700Z",
+    "updatedAt": "2020-03-27T02:42:18.700Z",
+    "profilePhoto": "/public/images/a.jpeg",
+    "coverPhoto": "/public/images/b.jpeg",
     "farmer": {
-      "farmerFullname": "Tobit Shorten",
-      "farmerPhoneNumber": "552 387 9468",
-      "farmerAddress": "6 Fordem Place",
-      "farmerStory":
-          "Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi. Integer ac neque.\n\nDuis bibendum. Morbi non quam nec dui luctus rutrum. Nulla tellus.",
-      "accountId": 1,
-      "_id": "5e7ca31be25843237006226e"
+      "farmerFullname": "DLTruong.c",
+      "farmerPhoneNumber": "096x.xxx.307",
+      "farmerAddress": "Vietnam",
+      "farmerStory": "No story",
+      "accountId": null,
+      "_id": "5e7d9468f715b13067a30f65",
     },
     "retailer": null,
     "researcher": null,
     "token": null,
-    "_id": "5e79c9eb93662543993416de",
-    "roleId": 1
+    "accountPassword":
+        r"$2b$12$ihwkJcE7j6Cjn8cJ.72amuet5.6967Din6XWayhUvza3.0lRDxB/C",
+    "accountUserName": "dltruongc",
+    "roleId": 1,
+    "salt": r"$2b$12$ihwkJcE7j6Cjn8cJ.72amu",
+    "__v": 0
   });
 
   Account get owner => _owner;

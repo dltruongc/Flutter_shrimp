@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -9,6 +10,7 @@ import 'package:shrimpapp/constants.dart';
 import 'package:shrimpapp/controllers/comment_controller.dart';
 import 'package:shrimpapp/models/Comment.dart';
 import 'package:shrimpapp/models/NewFeed.dart';
+import 'package:shrimpapp/secret.dart';
 import 'package:shrimpapp/utils/DateFormatter.dart';
 import 'package:shrimpapp/widgets/slider_images.dart';
 
@@ -57,6 +59,34 @@ class _CommentPageState extends State<CommentPage> {
   @override
   Widget build(BuildContext context) {
     TextEditingController cmtController = TextEditingController();
+    // FIXME: dump account
+    Future _onSubmit() async {
+      Comment newComment = Comment(
+        images: [],
+        movies: [],
+        profilePhoto: SecretKeys.owner.profilePhoto,
+        postId: widget.newFeed.id,
+        commentsContent: cmtController.text,
+        userFullName: SecretKeys.owner.fullName,
+        userId: SecretKeys.owner.id,
+      );
+
+      // FIXME: dump auth token
+      final result = await Dio().post(
+        '$kServerApiUrl/comments',
+        data: newComment,
+        options: new Options(
+            contentType: "application/x-www-form-urlencoded",
+            headers: {
+              'charset': 'utf-8',
+              'Authorization':
+                  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMWI2YTZmNmRmMDViYThiMzBlYTYyYSIsImlhdCI6MTU4NDgxMzgwNX0.qFCLBfdk1ps8GqrEUmjr_Ou2DLhPlUWYwimWY6cO8vQ'
+            }),
+      );
+
+      comments.add(newComment);
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: kLightColor,
@@ -189,6 +219,9 @@ class _CommentPageState extends State<CommentPage> {
                       style: Theme.of(context).textTheme.caption,
                     ),
                   ).show();
+                } else {
+                  //fsdf
+                  _onSubmit();
                 }
               },
             ),

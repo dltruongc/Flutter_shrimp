@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
@@ -8,10 +9,21 @@ import 'package:shrimpapp/models/Announce.dart';
 import 'package:shrimpapp/models/NewFeed.dart';
 
 class FavoriteController extends ChangeNotifier {
-  static Announce announce;
+  Announce announce;
   List<NewFeed> feeds = [];
   bool hasMore = true;
   final int _limit = 10;
+
+  // DELETE owner ID
+  Future<bool> findFeed(String feedId, String accountId) async {
+    if (announce == null) await fetchAnnouce(accountId);
+    try {
+      final found = announce.favorites.firstWhere((e) => e == feedId);
+      return found != null;
+    } catch (err) {
+      return false;
+    }
+  }
 
   Future fetchAnnouce(String accountId) async {
     try {
@@ -25,23 +37,25 @@ class FavoriteController extends ChangeNotifier {
   }
 
   Future fetchTop(String accountId) async {
-    if (announce == null) {
-      await fetchAnnouce(accountId);
+    await fetchAnnouce(accountId);
+    List<NewFeed> news;
+    try {
+      news = await NewFeedController()
+          .fetchIds(announce.favorites.sublist(0, _limit));
+    } catch (e) {
+      news = await NewFeedController().fetchIds(announce.favorites.sublist(0));
     }
 
-    final news = await NewFeedController()
-        .fetchIds(announce.favorites.sublist(0, _limit));
     if (news != null && news.isNotEmpty)
-      feeds.addAll(news);
+      feeds = news;
     else if (_limit > feeds.length) hasMore = false;
+    print('Announce From Top: ${announce.favorites}');
 
     notifyListeners();
   }
 
   Future fetchNews(String accountId, int id) async {
-    if (announce == null) {
-      await fetchAnnouce(accountId);
-    }
+    await fetchAnnouce(accountId);
 
     List<String> ids = [];
     try {
@@ -52,10 +66,10 @@ class FavoriteController extends ChangeNotifier {
 
     final news = await NewFeedController().fetchIds(ids);
 
-    print("ID : $id \t NEW LENGTH: ${news.length}");
     if (news != null && news.isNotEmpty)
       feeds.addAll(news);
     else if (_limit + id > feeds.length) hasMore = false;
+    print('Announce From IDs: ${announce.favorites}');
 
     notifyListeners();
   }
@@ -63,6 +77,43 @@ class FavoriteController extends ChangeNotifier {
   get length => announce.favorites.length;
 
   getAll() => feeds;
+
+  // FIXME: remove accountId
+  Future<bool> like(String authToken, String feed, String accountId) async {
+    if (announce == null) fetchAnnouce(accountId);
+    authToken = 'Bearer ' + authToken;
+    Response result = await Dio().post(
+      '$kServerApiUrl/announces',
+      data: {'favorite': feed},
+      options: Options(
+        contentType: "application/x-www-form-urlencoded",
+        headers: {'charset': 'utf-8', 'Authorization': authToken},
+      ),
+    );
+    return result.statusCode == 200;
+  }
+
+  // FIXME: remove accountId
+
+  Future<bool> unLike(String authToken, String feed, String accountId) async {
+    if (announce == null) fetchAnnouce(accountId);
+
+    authToken = 'Bearer ' + authToken;
+
+    Response result = await Dio().delete(
+      '$kServerApiUrl/announces',
+      data: {'favorite': feed},
+      options: Options(
+        contentType: "application/x-www-form-urlencoded",
+        headers: {
+          'charset': 'utf-8',
+          // FIXME: dump auth
+          'Authorization': authToken
+        },
+      ),
+    );
+    return result.statusCode == 200;
+  }
 
   // Future fetchTopFeeds(String accountId) async {
   //   if (announce == null) await fetchAnnouce(accountId);

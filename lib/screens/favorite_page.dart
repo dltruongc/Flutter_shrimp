@@ -7,10 +7,9 @@ import 'package:shrimpapp/models/NewFeed.dart';
 import 'package:shrimpapp/screens/newfeed_page.dart';
 
 // FIXME: dump account id
-String _dumpAccountId = "5e71f11bfbb5942d4031b0c0";
+String _dumpAccountId = "5e7d9468f715b13067a30f66";
 
 class FavoritePage extends StatelessWidget {
-  final FavoriteController favController = FavoriteController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +19,7 @@ class FavoritePage extends StatelessWidget {
       ),
       body: Consumer<FavoriteController>(builder: (context, controller, _) {
         List<NewFeed> newfeeds = controller.getAll();
-        if ((newfeeds == null || newfeeds.isEmpty) && controller.hasMore) {
+        if ((controller.announce == null || newfeeds.isEmpty)) {
           controller.fetchTop(_dumpAccountId);
           return LoadingScreen();
         }

@@ -1,22 +1,14 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:geocoder/model.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shrimpapp/components/account_bar.dart';
 import 'package:shrimpapp/components/submit_button.dart';
 import 'package:shrimpapp/constants.dart';
-import 'package:shrimpapp/controllers/account_controller.dart';
 import 'package:shrimpapp/controllers/auth_controller.dart';
-import 'package:shrimpapp/controllers/newfeed_controller.dart';
 import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/models/NewFeed.dart';
-import 'package:location/location.dart';
-import 'package:shrimpapp/providers/address_provider.dart';
 import 'package:shrimpapp/secret.dart';
 
 class NewFeedEditor extends StatefulWidget {
@@ -291,7 +283,6 @@ class _NewFeedEditorState extends State<NewFeedEditor> {
               asset: img,
               height: 200,
               width: 300,
-              quality: 80,
             ),
           ),
           Align(

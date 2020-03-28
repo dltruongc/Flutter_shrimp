@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:shrimpapp/components/account_bar.dart';
 import 'package:shrimpapp/components/loading_screen.dart';
 import 'package:shrimpapp/constants.dart';
+import 'package:shrimpapp/controllers/favorite_controller.dart';
 import 'package:shrimpapp/controllers/newfeed_controller.dart';
 import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/models/NewFeed.dart';
@@ -20,6 +21,12 @@ import 'package:shrimpapp/screens/comment_page.dart';
 import 'package:shrimpapp/screens/newfeed_editor.dart';
 import 'package:shrimpapp/utils/DateFormatter.dart';
 import 'package:shrimpapp/widgets/slider_images.dart';
+
+// FIXME: dump auth token string;
+final String authToken =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlN2Q5NDY4ZjcxNWIxMzA2N2EzMGY2NiIsImlhdCI6MTU4NTI4ODM0N30.EaIU0XqxemQSTW6nZhmCTeRZhfQBi8LKxCbnSf7s5ZU';
+
+final String accountId = "5e7d9468f715b13067a30f66";
 
 class NewFeedPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -56,7 +63,10 @@ class NewFeedPage extends StatelessWidget {
   handle(NewFeed feed, List<Asset> images, BuildContext context) async {
     // Convert images to base64
     Iterable<Future<String>> buffers = images.map((img) async {
-      ByteData x = await img.getByteData();
+      print('${img.originalHeight} / ${img.originalWidth}');
+      print('1024 / ${(1024 * img.originalWidth) ~/ img.originalHeight}');
+      ByteData x = await img.getThumbByteData(
+          (1024 * img.originalWidth) ~/ img.originalHeight, 1024);
       return base64Encode(x.buffer.asUint8List());
     });
 
@@ -158,7 +168,6 @@ class NewFeedPage extends StatelessWidget {
 class NewFeedItem extends StatefulWidget {
   final NewFeed newFeed;
   final Account owner;
-  bool like = false;
 
   NewFeedItem(
       {Key key, @required this.newFeed, @required this.owner, like = false})
@@ -169,10 +178,26 @@ class NewFeedItem extends StatefulWidget {
 }
 
 class _NewFeedItemState extends State<NewFeedItem> {
+  bool like = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    Provider.of<FavoriteController>(context)
+        .findFeed(widget.newFeed.id, widget.owner.id)
+        .then((found) {
+      setState(() {
+        like = found;
+      });
+    }).catchError((err) {
+      setState(() {
+        like = false;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool isOverflowContent =
-        widget.newFeed.newFeedContent.length > 50 ? true : false;
     return Container(
       child: Column(
         children: <Widget>[
@@ -208,26 +233,27 @@ class _NewFeedItemState extends State<NewFeedItem> {
                   child: MarkdownBody(
                     data: widget.newFeed.newFeedContent,
                     styleSheetTheme: MarkdownStyleSheetBaseTheme.material,
-                    // softWrap: true,
-                    // maxLines: isOverflowContent ? 4 : 100,
-                    // overflow: isOverflowContent
-                    //     ? TextOverflow.clip
-                    //     : TextOverflow.visible,
-                    // style: TextStyle(fontSize: 14.0, color: Colors.black),
                   ),
                 ),
               ],
             ),
           ),
-          // Images
-//          widget.newFeed.images.length > 0
-//              ? MyNetworkImage.fromPath(path: widget.newFeed.images[0])
-//              : SizedBox(height: 150.0, width: double.infinity),
-
           widget.newFeed.images.length > 0
               ? SliderImages(images: widget.newFeed.images)
               : SizedBox(),
           // Interactive post buttons
+          SizedBox(height: 4.0),
+          // TODO: update feature
+          // Align(
+          //   alignment: AlignmentDirectional.centerStart,
+          //   child: Padding(
+          //     padding: const EdgeInsets.all(8.0),
+          //     child: Text(
+          //       '${widget.newFeed.favorites} lượt quan tâm',
+          //       style: Theme.of(context).textTheme.subtitle,
+          //     ),
+          //   ),
+          // ),
           Container(
             decoration: BoxDecoration(
               border: Border(
@@ -245,12 +271,32 @@ class _NewFeedItemState extends State<NewFeedItem> {
               children: <Widget>[
                 FlatButton.icon(
                   padding: const EdgeInsets.all(0.0),
-                  onPressed: () {},
-                  icon: widget.like
+                  onPressed: () async {
+                    if (!like) {
+                      Provider.of<FavoriteController>(context, listen: false)
+                          .like(authToken, widget.newFeed.id, accountId);
+                      Provider.of<FavoriteController>(context, listen: false)
+                          .fetchAnnouce(accountId);
+                      setState(() {
+                        like = true;
+                      });
+                    } else {
+                      final unlike = await Provider.of<FavoriteController>(
+                              context,
+                              listen: false)
+                          .unLike(authToken, widget.newFeed.id, accountId);
+                      Provider.of<FavoriteController>(context, listen: false)
+                          .fetchAnnouce(accountId);
+                      setState(() {
+                        like = unlike ? false : like;
+                      });
+                    }
+                  },
+                  icon: like
                       ? Icon(
                           FontAwesomeIcons.solidThumbsUp,
                           size: 20.0,
-                          color: Colors.red.shade300,
+                          color: Colors.blue.shade400,
                         )
                       : Icon(
                           FontAwesomeIcons.thumbsUp,

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +7,7 @@ import 'package:shrimpapp/controllers/account_controller.dart';
 import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/models/NewFeed.dart';
 import 'package:http/http.dart' as http;
+import 'package:shrimpapp/providers/newfeed_provider.dart';
 
 class NewFeedController extends ChangeNotifier {
   List<NewFeed> _newFeeds = [];
@@ -42,6 +42,7 @@ class NewFeedController extends ChangeNotifier {
           } catch (e) {}
         }
         _newFeeds.addAll(results);
+        newFeedProvider.addAll(results);
       }
 
       notifyListeners();
@@ -51,6 +52,9 @@ class NewFeedController extends ChangeNotifier {
   }
 
   Future fetchId(String id) async {
+    final local = localFind(id);
+    if (local != null) return local;
+
     try {
       // FIXME: sort=-id
       final data = await http.get('$kServerApiUrl/newfeeds/$id');
@@ -67,7 +71,8 @@ class NewFeedController extends ChangeNotifier {
 
   NewFeed localFind(String id) {
     try {
-      var result = _newFeeds.firstWhere((account) => account.id == id);
+      var result =
+          newFeedProvider.feeds.firstWhere((account) => account.id == id);
       return result;
     } catch (err) {
       return null;
@@ -121,6 +126,8 @@ class NewFeedController extends ChangeNotifier {
               accounts.firstWhere((e) => e.id == results[i].accountId);
         } catch (e) {}
       }
+      _newFeeds.addAll(results);
+      newFeedProvider.addAll(results);
       return results;
     } catch (err) {
       return null;
@@ -131,6 +138,8 @@ class NewFeedController extends ChangeNotifier {
 
   void addFirst(Iterable<NewFeed> items) {
     this._newFeeds.insertAll(0, items);
+    newFeedProvider.feeds.insertAll(0, items);
+
     notifyListeners();
   }
 
@@ -141,7 +150,7 @@ class NewFeedController extends ChangeNotifier {
 
   void removeFirst() {
     if (this._newFeeds.length > 0) {
-      this._newFeeds.removeAt(0);
+      newFeedProvider.feeds.removeAt(0);
     }
     notifyListeners();
   }
@@ -194,6 +203,8 @@ class NewFeedController extends ChangeNotifier {
     AccountController accountController = AccountController();
     output.user = await accountController.fetchAccount(output.accountId);
     _newFeeds.insert(0, output);
+    this._newFeeds.add(output);
+
     notifyListeners();
   }
 
@@ -215,6 +226,8 @@ class NewFeedController extends ChangeNotifier {
     AccountController accountController = AccountController();
     output.user = await accountController.fetchAccount(output.accountId);
     _newFeeds.insert(0, output);
+    this._newFeeds.add(output);
+
     notifyListeners();
   }
 

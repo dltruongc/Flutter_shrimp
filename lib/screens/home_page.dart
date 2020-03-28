@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shrimpapp/components/reusable_card.dart';
 import 'package:shrimpapp/constants.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shrimpapp/controllers/favorite_controller.dart';
 import 'package:shrimpapp/screens/environment_page.dart';
 import 'package:shrimpapp/screens/favorite_page.dart';
 import 'package:shrimpapp/screens/newfeed_page.dart';
@@ -44,6 +46,11 @@ class _MyAppState extends State<MyApp> {
         currentIndex: _currentIndex,
         onTap: (int index) {
           setState(() {
+            if (index == 2) {
+              Provider.of<FavoriteController>(context, listen: false)
+                  .feeds
+                  .clear();
+            }
             _currentIndex = index;
           });
         },
