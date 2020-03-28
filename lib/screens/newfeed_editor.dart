@@ -116,6 +116,7 @@ class _NewFeedEditorState extends State<NewFeedEditor> {
               ),
               Form(
                 key: _formKey,
+                autovalidate: true,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[

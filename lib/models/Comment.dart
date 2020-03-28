@@ -6,7 +6,7 @@ class Comment {
   DateTime createdAt;
   DateTime updatedAt;
   String postId;
-  String content;
+  String commentsContent;
   List images;
   List movies;
 
@@ -17,7 +17,7 @@ class Comment {
   Account user;
 
   Comment(
-      {commentsContent,
+      {this.commentsContent,
       id,
       movies,
       images,
@@ -26,7 +26,6 @@ class Comment {
       this.userFullName,
       @required this.userId})
       : this.id = id,
-        this.content = commentsContent,
         this.createdAt = DateTime.now(),
         this.updatedAt = DateTime.now(),
         this.images = images != null ? images : [],
@@ -42,7 +41,7 @@ class Comment {
         ? DateTime.tryParse(parsedJson["updatedAt"])
         : null;
     postId = parsedJson['postId'];
-    content = parsedJson['commentsContent'];
+    commentsContent = parsedJson['commentsContent'];
     profilePhoto = parsedJson['profilePhoto'];
     userFullName = parsedJson['userFullName'];
     userId = parsedJson['userId'];
@@ -59,7 +58,7 @@ class Comment {
       'createdAt': this.createdAt,
       'updatedAt': this.updatedAt,
       'postId': postId,
-      'commentsContent': content,
+      'commentsContent': this.commentsContent,
       'images': images,
       'movies': movies,
       'profilePhoto': profilePhoto,

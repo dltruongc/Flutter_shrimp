@@ -1,11 +1,25 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shrimpapp/components/submit_button.dart';
 import 'package:shrimpapp/constants.dart';
+import 'package:shrimpapp/models/Account.dart';
+import 'package:shrimpapp/models/Farmer.dart';
+import 'package:shrimpapp/models/Role.dart';
+import 'package:shrimpapp/screens/login_page.dart';
 import 'package:shrimpapp/validation/input_validate.dart';
 
 class FarmerEditorWidget extends StatefulWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final String username;
+  final String password;
+  final Asset image;
+
+  FarmerEditorWidget(this.username, this.password, this.image);
 
   @override
   _FarmerEditorWidgetState createState() => _FarmerEditorWidgetState();
@@ -44,6 +58,7 @@ class _FarmerEditorWidgetState extends State<FarmerEditorWidget> {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Form(
+                autovalidate: true,
                 key: widget._formKey,
                 child: Column(
                   children: <Widget>[
@@ -124,9 +139,88 @@ class _FarmerEditorWidgetState extends State<FarmerEditorWidget> {
                       children: <Widget>[
                         SubmitButton(
                           title: 'Hoàn tất',
-                          onPressed: () {
-                            if (widget._formKey.currentState.validate())
-                              Navigator.of(context).pop();
+                          onPressed: () async {
+                            if (widget._formKey.currentState.validate()) {
+                              ByteData encoded;
+                              try {
+                                encoded = await widget.image.getThumbByteData(
+                                    1024 *
+                                        widget.image.originalWidth ~/
+                                        widget.image.originalHeight,
+                                    1024);
+                              } catch (err) {
+                                encoded = null;
+                              }
+                              // account instance
+                              Account newAccount = Account(
+                                address: _addressCtrl.text,
+                                createdAt: DateTime.now(),
+                                updatedAt: DateTime.now(),
+                                password: widget.password,
+                                username: widget.username,
+                                profilePhoto: encoded != null
+                                    ? base64Encode(encoded.buffer.asUint8List())
+                                    : null,
+                                researcher: null,
+                                retailer: null,
+                                role: RoleTypes.farmer,
+                                story: _storyCtrl.text,
+                                farmer: Farmer(
+                                  farmerAddress: _addressCtrl.text,
+                                  farmerFullname: _fullNameCtrl.text,
+                                  farmerPhoneNumber: _phoneCtrl.text,
+                                  farmerStory: _storyCtrl.text,
+                                ),
+                                phone: _phoneCtrl.text,
+                              );
+                              Response res;
+                              try {
+                                res = await Dio().post(
+                                  '$kServerApiUrl/accounts',
+                                  data: newAccount.toMap(),
+                                  options: new Options(
+                                    contentType:
+                                        "application/x-www-form-urlencoded",
+                                    headers: {
+                                      'charset': 'utf-8',
+                                    },
+                                  ),
+                                );
+
+                                if (res.statusCode > 400 &&
+                                    res.statusCode < 500) {
+                                  Alert(
+                                          context: context,
+                                          content: Text(
+                                              'Kiểm tra lại kết nối Internet và thử lại!'),
+                                          title: 'Lỗi',
+                                          type: AlertType.error)
+                                      .show();
+                                } else if (res.statusCode == 200) {
+                                  Alert(
+                                      context: context,
+                                      content:
+                                          Text('Đăng kí tài khoản thành công!'),
+                                      title: 'Thành công',
+                                      type: AlertType.success,
+                                      
+                                      closeFunction: () {
+                                        Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                            builder: (context) => LoginPage(),
+                                          ),
+                                        );
+                                      }).show();
+                                }
+                              } catch (err) {
+                                Alert(
+                                        context: context,
+                                        content: Text('Vui lòng thử lại sau!'),
+                                        title: 'Lỗi',
+                                        type: AlertType.error)
+                                    .show();
+                              }
+                            }
                           },
                           height: 60.0,
                           width: 180.0,

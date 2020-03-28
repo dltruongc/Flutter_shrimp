@@ -6,8 +6,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shrimpapp/controllers/favorite_controller.dart';
 import 'package:shrimpapp/screens/environment_page.dart';
 import 'package:shrimpapp/screens/favorite_page.dart';
+import 'package:shrimpapp/screens/login_page.dart';
 import 'package:shrimpapp/screens/newfeed_page.dart';
 import 'package:shrimpapp/screens/news_page.dart';
+import 'package:shrimpapp/screens/register_page.dart';
 import 'package:shrimpapp/screens/weather.dart';
 import '../widgets/audio_player.dart';
 import 'price_page.dart';
@@ -92,6 +94,29 @@ class HomePage extends StatelessWidget {
                 ),
                 child: Column(
                   children: <Widget>[
+                    Container(
+                      child: RaisedButton(
+                          child: Text("RegisterPage"),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    RegisterPage(),
+                              ),
+                            );
+                          }),
+                    ),
+                    Container(
+                      child: RaisedButton(
+                          child: Text("LoginPage"),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => LoginPage(),
+                              ),
+                            );
+                          }),
+                    ),
                     Expanded(
                       child: Row(
                         children: <Widget>[

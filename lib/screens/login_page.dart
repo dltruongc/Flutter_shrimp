@@ -1,5 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shrimpapp/constants.dart';
 import 'package:shrimpapp/screens/register_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -75,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
                           if (val.length == 0) return "Không được bỏ trống!";
                           if (val.length < 5)
                             return "Tên đăng nhập không hợp lệ";
-                          return '';
+                          return null;
                         },
                         decoration: InputDecoration(
                           enabledBorder: UnderlineInputBorder(
@@ -102,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                         validator: (val) {
                           if (val.length == 0) return "Không được bỏ trống!";
                           if (val.length < 5) return "Mật khẩu quá ngắn";
-                          return '';
+                          return null;
                         },
                         decoration: InputDecoration(
                           enabledBorder: UnderlineInputBorder(
@@ -129,9 +132,35 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       // TODO: Login Handle
-                      // if (_formKey.currentState.validate());
+                      if (_formKey.currentState.validate()) {
+                        try {
+                          Response res = await Dio()
+                              .post('$kServerApiUrl/accounts/login', data: {
+                            'accountUserName': _emailInput.text,
+                            'accountPassword': _passWordInput.text
+                          });
+
+                          if (res.statusCode == 200) {
+                            Navigator.of(context).pop();
+                          } else {
+                            Alert(
+                              context: context,
+                              title: 'Lỗi',
+                              content: Text(res.data['message']),
+                              type: AlertType.error,
+                            ).show();
+                          }
+                        } catch (err) {
+                          Alert(
+                            context: context,
+                            title: 'Lỗi',
+                            content: Text(err.response.data['message']),
+                            type: AlertType.error,
+                          ).show();
+                        }
+                      }
                       // else
                     },
                     child: Container(

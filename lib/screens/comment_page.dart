@@ -72,19 +72,47 @@ class _CommentPageState extends State<CommentPage> {
       );
 
       // FIXME: dump auth token
-      final result = await Dio().post(
-        '$kServerApiUrl/comments',
-        data: newComment,
-        options: new Options(
-            contentType: "application/x-www-form-urlencoded",
-            headers: {
-              'charset': 'utf-8',
-              'Authorization':
-                  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMWI2YTZmNmRmMDViYThiMzBlYTYyYSIsImlhdCI6MTU4NDgxMzgwNX0.qFCLBfdk1ps8GqrEUmjr_Ou2DLhPlUWYwimWY6cO8vQ'
-            }),
-      );
+      try {
+        final result = await Dio().post(
+          '$kServerApiUrl/comments',
+          data: newComment.toMap(),
+          options: new Options(
+              contentType: "application/x-www-form-urlencoded",
+              headers: {
+                'charset': 'utf-8',
+                'Authorization':
+                    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMWI2YTZmNmRmMDViYThiMzBlYTYyYSIsImlhdCI6MTU4NDgxMzgwNX0.qFCLBfdk1ps8GqrEUmjr_Ou2DLhPlUWYwimWY6cO8vQ'
+              }),
+        );
 
-      comments.add(newComment);
+        if (result.statusCode != 200) {
+          Alert(
+                  title: 'Lỗi',
+                  content: Text(
+                    'Không gởi được',
+                    style: Theme.of(context).textTheme.body1,
+                  ),
+                  type: AlertType.error)
+              .show();
+        } else {
+          // update for local device only
+          // FIXME: dump owner
+          newComment.user = SecretKeys.owner;
+
+          setState(() {
+            comments.add(newComment);
+          });
+        }
+      } catch (err) {
+        Alert(
+                title: 'Lỗi',
+                content: Text(
+                  'Không gởi được',
+                  style: Theme.of(context).textTheme.body1,
+                ),
+                type: AlertType.error)
+            .show();
+      }
     }
 
     return Scaffold(
@@ -221,6 +249,7 @@ class _CommentPageState extends State<CommentPage> {
                   ).show();
                 } else {
                   //fsdf
+                  print('Alo');
                   _onSubmit();
                 }
               },

@@ -40,22 +40,13 @@ class NewFeedPage extends StatelessWidget {
     _scaffoldKey.currentState
       ..showSnackBar(
         SnackBar(
-          content: Text('Đang tải lên...'),
-          backgroundColor: Colors.yellow,
+          content: Text(
+            'Đang tải lên...',
+            style: TextStyle(color: Colors.black),
+          ),
+          backgroundColor: Colors.yellow.shade300,
         ),
       );
-
-    if (Provider.of<NewFeedController>(context, listen: false)
-        .findByDate(result['createdAt'])) {
-      _scaffoldKey.currentState
-        ..removeCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text('Bài viết mới đã được đăng'),
-            backgroundColor: Colors.lightGreen,
-          ),
-        );
-    }
 
     handle(result['feed'], result['images'], context);
   }
@@ -96,16 +87,27 @@ class NewFeedPage extends StatelessWidget {
     feed.newFeedLocation = addressString;
 
     // FIXME: Dump create alter
-    NewFeed x = await Provider.of<NewFeedController>(context, listen: false)
-        .createNewFeed(feed);
-    _scaffoldKey.currentState
-      ..removeCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text('Bài viết mới đã được đăng'),
-          backgroundColor: Colors.lightGreen,
-        ),
-      );
+    try {
+      NewFeed x = await Provider.of<NewFeedController>(context, listen: false)
+          .createNewFeed(feed);
+      _scaffoldKey.currentState
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('Bài viết mới đã được đăng'),
+            backgroundColor: Colors.lightGreen,
+          ),
+        );
+    } catch (err) {
+      _scaffoldKey.currentState
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('Đăng bài thất bại.'),
+            backgroundColor: Colors.red.shade400,
+          ),
+        );
+    }
   }
 
   @override

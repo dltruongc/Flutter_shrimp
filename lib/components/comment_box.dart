@@ -38,7 +38,7 @@ class CommentBox extends StatelessWidget {
           // ),
           Padding(
             padding: const EdgeInsets.only(left: 68.0),
-            child: MarkdownBody(data: comment.content),
+            child: MarkdownBody(data: comment.commentsContent),
           ),
           Align(
             alignment: AlignmentDirectional.centerEnd,
