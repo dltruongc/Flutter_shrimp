@@ -18,8 +18,9 @@ class RetailerEditorWidget extends StatefulWidget {
   final String username;
   final String password;
   final Asset image;
+  final Asset cover;
 
-  RetailerEditorWidget(this.username, this.password, this.image);
+  RetailerEditorWidget(this.username, this.password, this.image, {this.cover});
 
   @override
   _RetailerEditorWidgetState createState() => _RetailerEditorWidgetState();
@@ -158,6 +159,18 @@ class _RetailerEditorWidgetState extends State<RetailerEditorWidget> {
                                 } catch (err) {
                                   encoded = null;
                                 }
+
+                                ByteData encoded1;
+                                try {
+                                  encoded1 = await widget.cover
+                                      .getThumbByteData(
+                                          1024 *
+                                              widget.cover.originalWidth ~/
+                                              widget.cover.originalHeight,
+                                          1024);
+                                } catch (err) {
+                                  encoded1 = null;
+                                }
                                 // account instance
                                 Account newAccount = Account(
                                   address: _addressCtrl.text,
@@ -165,6 +178,10 @@ class _RetailerEditorWidgetState extends State<RetailerEditorWidget> {
                                   updatedAt: DateTime.now(),
                                   password: widget.password,
                                   username: widget.username,
+                                  coverPhoto: encoded1 != null
+                                      ? base64Encode(
+                                          encoded1.buffer.asUint8List())
+                                      : null,
                                   profilePhoto: encoded != null
                                       ? base64Encode(
                                           encoded.buffer.asUint8List())

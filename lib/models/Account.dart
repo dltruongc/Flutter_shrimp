@@ -21,10 +21,8 @@ class Account {
   Retailer retailer;
   Farmer farmer;
   Researcher researcher;
-  // FIXME: auth token
-  //token: { type: String },
-  //expiredToken: Date,
-  //salt: String
+  String token;
+  DateTime expiredToken;
 
   Account({
     id,
@@ -36,12 +34,15 @@ class Account {
     address,
     createdAt,
     String profilePhoto,
+    this.coverPhoto,
     updatedAt,
     password,
     story,
     this.retailer,
     this.farmer,
     this.researcher,
+    this.token,
+    this.expiredToken,
   })  : id = id,
         username = username,
         birth = birth,
@@ -53,7 +54,7 @@ class Account {
         isMale = isMale,
         story = story,
         _password = password ?? null,
-        profilePhoto = profilePhoto;
+        this.profilePhoto = profilePhoto;
 
   Account.fromJson(Map<String, dynamic> parsedJson)
       : this.id = parsedJson['_id'],
@@ -64,6 +65,8 @@ class Account {
             : null,
         this._password = null,
         this.role = Role.fromInt(parsedJson['roleId']),
+        this.profilePhoto = parsedJson['profilePhoto'],
+        this.coverPhoto = parsedJson['coverPhoto'],
         createdAt = parsedJson["updatedAt"] != null
             ? DateTime.tryParse(parsedJson["createdAt"])
             : null,
@@ -75,7 +78,6 @@ class Account {
     if (parsedJson[role] != null) {
       this.fullName = parsedJson[role]['${role}Fullname'] ??
           parsedJson[role]['${role}Name'];
-      this.profilePhoto = parsedJson['profilePhoto'];
       this.phone = parsedJson[role]['${role}PhoneNumber'];
       this.address = parsedJson[role]['${role}Address'];
       this.story = parsedJson[role]['${role}Story'] ?? null;
@@ -104,6 +106,8 @@ class Account {
       'updatedAt': updatedAt,
       'isMale': isMale,
       'birth': birth,
+      'profilePhoto': profilePhoto,
+      'coverPhoto': coverPhoto,
       'roleId': role.toInt(),
       'retailer': retailer != null ? retailer.toMap() : null,
       'farmer': farmer != null ? farmer.toMap() : null,

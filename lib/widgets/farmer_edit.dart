@@ -18,8 +18,9 @@ class FarmerEditorWidget extends StatefulWidget {
   final String username;
   final String password;
   final Asset image;
+  final Asset cover;
 
-  FarmerEditorWidget(this.username, this.password, this.image);
+  FarmerEditorWidget(this.username, this.password, this.image, {this.cover});
 
   @override
   _FarmerEditorWidgetState createState() => _FarmerEditorWidgetState();
@@ -151,6 +152,17 @@ class _FarmerEditorWidgetState extends State<FarmerEditorWidget> {
                               } catch (err) {
                                 encoded = null;
                               }
+
+                              ByteData encoded1;
+                              try {
+                                encoded1 = await widget.cover.getThumbByteData(
+                                    1024 *
+                                        widget.cover.originalWidth ~/
+                                        widget.cover.originalHeight,
+                                    1024);
+                              } catch (err) {
+                                encoded1 = null;
+                              }
                               // account instance
                               Account newAccount = Account(
                                 address: _addressCtrl.text,
@@ -160,6 +172,10 @@ class _FarmerEditorWidgetState extends State<FarmerEditorWidget> {
                                 username: widget.username,
                                 profilePhoto: encoded != null
                                     ? base64Encode(encoded.buffer.asUint8List())
+                                    : null,
+                                coverPhoto: encoded1 != null
+                                    ? base64Encode(
+                                        encoded1.buffer.asUint8List())
                                     : null,
                                 researcher: null,
                                 retailer: null,
@@ -203,7 +219,6 @@ class _FarmerEditorWidgetState extends State<FarmerEditorWidget> {
                                           Text('Đăng kí tài khoản thành công!'),
                                       title: 'Thành công',
                                       type: AlertType.success,
-                                      
                                       closeFunction: () {
                                         Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(

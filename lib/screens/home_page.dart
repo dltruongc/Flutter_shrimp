@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shrimpapp/components/reusable_card.dart';
 import 'package:shrimpapp/constants.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shrimpapp/controllers/auth_controller.dart';
 import 'package:shrimpapp/controllers/favorite_controller.dart';
 import 'package:shrimpapp/screens/environment_page.dart';
 import 'package:shrimpapp/screens/favorite_page.dart';
@@ -11,7 +13,9 @@ import 'package:shrimpapp/screens/newfeed_page.dart';
 import 'package:shrimpapp/screens/news_page.dart';
 import 'package:shrimpapp/screens/register_page.dart';
 import 'package:shrimpapp/screens/weather.dart';
+import 'package:shrimpapp/widgets/login_alert.dart';
 import '../widgets/audio_player.dart';
+import 'login_require.dart';
 import 'price_page.dart';
 
 class MyApp extends StatefulWidget {
@@ -49,11 +53,17 @@ class _MyAppState extends State<MyApp> {
         onTap: (int index) {
           setState(() {
             if (index == 2) {
-              Provider.of<FavoriteController>(context, listen: false)
-                  .feeds
-                  .clear();
-            }
-            _currentIndex = index;
+              if (Provider.of<AuthController>(context, listen: false).owner ==
+                  null) {
+                LoginAlert(context: context, title: 'Đăng nhập').alert.show();
+              } else {
+                Provider.of<FavoriteController>(context, listen: false)
+                    .feeds
+                    .clear();
+                _currentIndex = 2;
+              }
+            } else
+              _currentIndex = index;
           });
         },
       ),
@@ -72,7 +82,6 @@ class HomePage extends StatelessWidget {
       ),
       body: Column(
         children: <Widget>[
-          // FIXME: Audio player widget implement
           Container(
             height: 180.0,
             decoration: BoxDecoration(

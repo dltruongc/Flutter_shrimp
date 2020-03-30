@@ -1,8 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shrimpapp/constants.dart';
+import 'package:shrimpapp/controllers/auth_controller.dart';
+import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/screens/register_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -32,6 +35,39 @@ class _LoginPageState extends State<LoginPage> {
       child:
           _showPassword ? Icon(Icons.visibility_off) : Icon(Icons.visibility),
     );
+  }
+
+  onLogin() async {
+    try {
+      Response res = await Dio().post('$kServerApiUrl/accounts/login', data: {
+        'accountUserName': _emailInput.text,
+        'accountPassword': _passWordInput.text
+      });
+
+      if (res.statusCode == 200) {
+        Account logedAccount = Account.fromJson(res.data['user']);
+
+        logedAccount.token = res.data['token'];
+        logedAccount.expiredToken = DateTime.parse(res.data['expire']);
+        Provider.of<AuthController>(context, listen: false)
+            .setOwner(logedAccount);
+        Navigator.of(context).pop();
+      } else {
+        Alert(
+          context: context,
+          title: 'Lỗi',
+          content: Text(res.data['message']),
+          type: AlertType.error,
+        ).show();
+      }
+    } catch (err) {
+      Alert(
+        context: context,
+        title: 'Lỗi',
+        content: Text(err.response.data['message']),
+        type: AlertType.error,
+      ).show();
+    }
   }
 
   @override
@@ -133,35 +169,9 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   GestureDetector(
                     onTap: () async {
-                      // TODO: Login Handle
                       if (_formKey.currentState.validate()) {
-                        try {
-                          Response res = await Dio()
-                              .post('$kServerApiUrl/accounts/login', data: {
-                            'accountUserName': _emailInput.text,
-                            'accountPassword': _passWordInput.text
-                          });
-
-                          if (res.statusCode == 200) {
-                            Navigator.of(context).pop();
-                          } else {
-                            Alert(
-                              context: context,
-                              title: 'Lỗi',
-                              content: Text(res.data['message']),
-                              type: AlertType.error,
-                            ).show();
-                          }
-                        } catch (err) {
-                          Alert(
-                            context: context,
-                            title: 'Lỗi',
-                            content: Text(err.response.data['message']),
-                            type: AlertType.error,
-                          ).show();
-                        }
+                        await onLogin();
                       }
-                      // else
                     },
                     child: Container(
                       height: 60,

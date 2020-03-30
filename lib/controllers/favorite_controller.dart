@@ -13,6 +13,8 @@ class FavoriteController extends ChangeNotifier {
   List<NewFeed> feeds = [];
   bool hasMore = true;
   final int _limit = 10;
+  int length = 0;
+  NewFeedController newFeedController = NewFeedController();
 
   // DELETE owner ID
   Future<bool> findFeed(String feedId, String accountId) async {
@@ -31,8 +33,10 @@ class FavoriteController extends ChangeNotifier {
           await http.get('$kServerApiUrl/announces?accountId=$accountId');
       final parsedJson = json.decode(data.body);
       announce = Announce.fromMap(parsedJson['data'].first);
+      length = announce.favorites.length;
     } catch (err) {
       print(err);
+      length = 0;
     }
   }
 
@@ -40,15 +44,22 @@ class FavoriteController extends ChangeNotifier {
     await fetchAnnouce(accountId);
     List<NewFeed> news;
     try {
-      news = await NewFeedController()
+      news = await newFeedController
           .fetchIds(announce.favorites.sublist(0, _limit));
     } catch (e) {
-      news = await NewFeedController().fetchIds(announce.favorites.sublist(0));
+      news = await newFeedController.fetchIds(announce.favorites.sublist(0));
     }
 
     if (news != null && news.isNotEmpty)
       feeds = news;
-    else if (_limit > feeds.length) hasMore = false;
+    else if (_limit > feeds.length) {
+      hasMore = false;
+      this.length = feeds.length;
+    }
+    if (!newFeedController.hasMore) {
+      hasMore = false;
+      this.length = feeds.length;
+    }
     print('Announce From Top: ${announce.favorites}');
 
     notifyListeners();
@@ -64,21 +75,25 @@ class FavoriteController extends ChangeNotifier {
       ids = announce.favorites.sublist(id);
     }
 
-    final news = await NewFeedController().fetchIds(ids);
+    final news = await newFeedController.fetchIds(ids);
 
     if (news != null && news.isNotEmpty)
       feeds.addAll(news);
-    else if (_limit + id > feeds.length) hasMore = false;
+    else if (_limit + id > feeds.length) {
+      hasMore = false;
+      this.length = feeds.length;
+    }
+    if (!newFeedController.hasMore) {
+      hasMore = false;
+      this.length = feeds.length;
+    }
     print('Announce From IDs: ${announce.favorites}');
 
     notifyListeners();
   }
 
-  get length => announce.favorites.length;
-
   getAll() => feeds;
 
-  // FIXME: remove accountId
   Future<bool> like(String authToken, String feed, String accountId) async {
     if (announce == null) fetchAnnouce(accountId);
     authToken = 'Bearer ' + authToken;
@@ -93,8 +108,6 @@ class FavoriteController extends ChangeNotifier {
     return result.statusCode == 200;
   }
 
-  // FIXME: remove accountId
-
   Future<bool> unLike(String authToken, String feed, String accountId) async {
     if (announce == null) fetchAnnouce(accountId);
 
@@ -105,11 +118,7 @@ class FavoriteController extends ChangeNotifier {
       data: {'favorite': feed},
       options: Options(
         contentType: "application/x-www-form-urlencoded",
-        headers: {
-          'charset': 'utf-8',
-          // FIXME: dump auth
-          'Authorization': authToken
-        },
+        headers: {'charset': 'utf-8', 'Authorization': authToken},
       ),
     );
     return result.statusCode == 200;
@@ -118,7 +127,7 @@ class FavoriteController extends ChangeNotifier {
   // Future fetchTopFeeds(String accountId) async {
   //   if (announce == null) await fetchAnnouce(accountId);
 
-  //   final List<NewFeed> newfeeds = await NewFeedController()
+  //   final List<NewFeed> newfeeds = await newFeedController
   //       .fetchIds(announce.getItems(limit: _limit, page: count ~/ 10));
 
   //   count += newfeeds.length;

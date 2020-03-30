@@ -9,7 +9,6 @@ import 'package:shrimpapp/constants.dart';
 import 'package:shrimpapp/controllers/auth_controller.dart';
 import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/models/NewFeed.dart';
-import 'package:shrimpapp/secret.dart';
 
 class NewFeedEditor extends StatefulWidget {
   @override
@@ -17,8 +16,6 @@ class NewFeedEditor extends StatefulWidget {
 }
 
 class _NewFeedEditorState extends State<NewFeedEditor> {
-// FIXME: dump owner
-  Account owner = SecretKeys.owner;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -72,18 +69,23 @@ class _NewFeedEditorState extends State<NewFeedEditor> {
       title: _titleController.text,
       views: 0,
     );
-    Navigator.pop(context, {'feed': newFeed, 'images': images});
+    Navigator.pop(context, {'feed': newFeed, 'images': images, 'data': true});
   }
 
   @override
   Widget build(BuildContext context) {
+    Account owner = Provider.of<AuthController>(context).owner;
     return Scaffold(
       appBar: AppBar(
         title: Text('Soạn thảo'),
         centerTitle: true,
         actions: <Widget>[
           FlatButton.icon(
-            onPressed: onSubmit,
+            onPressed: () {
+              if (_formKey.currentState.validate()) {
+                onSubmit();
+              }
+            },
             icon: Icon(
               Icons.check,
               color: Colors.white,
@@ -257,7 +259,11 @@ class _NewFeedEditorState extends State<NewFeedEditor> {
                   children: <Widget>[
                     SubmitButton(
                       title: 'Hoàn tất',
-                      onPressed: onSubmit,
+                      onPressed: () {
+                        if (_formKey.currentState.validate()) {
+                          onSubmit();
+                        }
+                      },
                       height: 40.0,
                       width: 120.0,
                     ),

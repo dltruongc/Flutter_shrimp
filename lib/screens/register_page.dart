@@ -1,9 +1,6 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
-import 'package:shrimpapp/components/image_picker.dart';
 import 'package:shrimpapp/components/submit_button.dart';
 import 'package:shrimpapp/constants.dart';
 import 'package:shrimpapp/widgets/farmer_edit.dart';
@@ -22,23 +19,12 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _passwordCtrl = TextEditingController();
   TextEditingController _passwordRetypeCtrl = TextEditingController();
   Asset image;
+  Asset coverImage;
   bool _obscureText = true;
-
-  // _submitButton() {
-  //   return SubmitButton(
-  //       title: 'Đăng ký',
-  //       onPressed: () {
-  //         // TODO: create model
-  //         // bool ok = _formKey.currentState.validate();
-  //         // if (ok) _createModel();
-  //       });
-  // }
 
   bool _accountExisted = false;
 
-  _onSubmit() async {}
-
-  Future<void> loadAssets() async {
+  Future<Asset> loadAssets() async {
     List<Asset> resultList = List<Asset>();
 
     try {
@@ -57,10 +43,8 @@ class _RegisterPageState extends State<RegisterPage> {
     } on Exception catch (e) {
       print('ERRRORRRRR: $e');
     }
-    if (!mounted) return;
-    setState(() {
-      image = resultList[0];
-    });
+    if (!mounted) return null;
+    return resultList[0];
   }
 
   @override
@@ -205,6 +189,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     this._userNameCtrl.text,
                                     this._passwordCtrl.text,
                                     this.image,
+                                    cover: this.coverImage,
                                   ),
                                 ),
                               );
@@ -235,6 +220,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     this._userNameCtrl.text,
                                     this._passwordCtrl.text,
                                     this.image,
+                                    cover: this.coverImage,
                                   ),
                                 ),
                               );
@@ -254,52 +240,106 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _avatarPicker() {
-    return Container(
-      margin: const EdgeInsets.only(top: 60, bottom: 16),
-      height: 160,
-      width: 160,
-      child: Stack(
-        children: <Widget>[
-          image == null
-              ? Container(
-                  height: 150,
-                  width: 150,
-                  child: CircleAvatar(
-                    backgroundImage: AssetImage(
-                      'images/person.png',
-                    ),
-                    backgroundColor: Colors.transparent,
-                  ),
+    return Stack(
+      children: <Widget>[
+        Container(
+          margin: const EdgeInsets.only(top: 0, bottom: 16),
+          height: 200,
+          width: double.infinity,
+          child: coverImage != null
+              ? AssetThumb(
+                  asset: coverImage,
+                  height: 200,
+                  width: MediaQuery.of(context).size.width ~/ 1,
                 )
-              : ClipRRect(
-                  borderRadius: BorderRadius.circular(150),
-                  child: AssetThumb(
-                    asset: image,
-                    width: 150,
-                    height: 150,
+              : Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('images/weather_wall.png'),
+                      fit: BoxFit.cover,
+                      colorFilter: new ColorFilter.mode(
+                        Colors.teal.withOpacity(0.5),
+                        BlendMode.dstATop,
+                      ),
+                    ),
                   ),
                 ),
-          Align(
-            alignment: AlignmentDirectional.bottomEnd,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(48),
-                color: Color(0xff22B1A9),
-              ),
-              child: IconButton(
-                icon: Icon(
-                  Icons.camera_alt,
-                  color: Colors.white,
+        ),
+        Container(
+          margin: const EdgeInsets.only(top: 20, bottom: 16),
+          height: 160,
+          width: 160,
+          child: Stack(
+            children: <Widget>[
+              image == null
+                  ? Container(
+                      height: 150,
+                      width: 150,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(150),
+                        border: Border.all(
+                          color: Colors.teal.shade400,
+                          width: 0.5,
+                        ),
+                      ),
+                      child: CircleAvatar(
+                        backgroundImage: AssetImage(
+                          'images/person.png',
+                        ),
+                        backgroundColor: Colors.teal.shade100.withAlpha(80),
+                      ),
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(150),
+                      child: AssetThumb(
+                        asset: image,
+                        width: 150,
+                        height: 150,
+                      ),
+                    ),
+              Align(
+                alignment: AlignmentDirectional.bottomEnd,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(48),
+                    color: Color(0xff22B1A9),
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.camera_alt,
+                      color: Colors.white,
+                    ),
+                    onPressed: () async {
+                      // ImagePickAlert.alert(context, [image]).show();
+                      Asset x = await loadAssets();
+                      setState(() {
+                        image = x;
+                      });
+                    },
+                  ),
                 ),
-                onPressed: () {
-                  // ImagePickAlert.alert(context, [image]).show();
-                  loadAssets();
-                },
-              ),
+              )
+            ],
+          ),
+        ),
+        Align(
+          alignment: AlignmentDirectional.topEnd,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 10.0, right: 16.0),
+            child: RaisedButton.icon(
+              icon: Icon(Icons.camera_enhance, color: Colors.white, size: 32.0),
+              label: Text('Ảnh nền', style: TextStyle(color: Colors.white)),
+              color: Colors.teal.shade300,
+              onPressed: () async {
+                Asset x = await loadAssets();
+                setState(() {
+                  coverImage = x;
+                });
+              },
             ),
-          )
-        ],
-      ),
+          ),
+        ),
+      ],
     );
   }
 }

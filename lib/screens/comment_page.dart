@@ -3,15 +3,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animations/loading_animations.dart';
+import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shrimpapp/components/account_bar.dart';
 import 'package:shrimpapp/components/comment_box.dart';
 import 'package:shrimpapp/constants.dart';
+import 'package:shrimpapp/controllers/auth_controller.dart';
 import 'package:shrimpapp/controllers/comment_controller.dart';
+import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/models/Comment.dart';
 import 'package:shrimpapp/models/NewFeed.dart';
-import 'package:shrimpapp/secret.dart';
 import 'package:shrimpapp/utils/DateFormatter.dart';
+import 'package:shrimpapp/widgets/login_alert.dart';
 import 'package:shrimpapp/widgets/slider_images.dart';
 
 class CommentPage extends StatefulWidget {
@@ -59,19 +62,21 @@ class _CommentPageState extends State<CommentPage> {
   @override
   Widget build(BuildContext context) {
     TextEditingController cmtController = TextEditingController();
-    // FIXME: dump account
+    final Account owner =
+        Provider.of<AuthController>(context, listen: false).owner;
     Future _onSubmit() async {
       Comment newComment = Comment(
         images: [],
         movies: [],
-        profilePhoto: SecretKeys.owner.profilePhoto,
+        profilePhoto: owner.profilePhoto,
         postId: widget.newFeed.id,
         commentsContent: cmtController.text,
-        userFullName: SecretKeys.owner.fullName,
-        userId: SecretKeys.owner.id,
+        userFullName: owner.fullName,
+        userId: owner.id,
       );
 
-      // FIXME: dump auth token
+      final String token = owner.token;
+
       try {
         final result = await Dio().post(
           '$kServerApiUrl/comments',
@@ -80,13 +85,13 @@ class _CommentPageState extends State<CommentPage> {
               contentType: "application/x-www-form-urlencoded",
               headers: {
                 'charset': 'utf-8',
-                'Authorization':
-                    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMWI2YTZmNmRmMDViYThiMzBlYTYyYSIsImlhdCI6MTU4NDgxMzgwNX0.qFCLBfdk1ps8GqrEUmjr_Ou2DLhPlUWYwimWY6cO8vQ'
+                'Authorization': 'Bearer ' + token
               }),
         );
 
         if (result.statusCode != 200) {
           Alert(
+                  context: context,
                   title: 'Lỗi',
                   content: Text(
                     'Không gởi được',
@@ -96,8 +101,7 @@ class _CommentPageState extends State<CommentPage> {
               .show();
         } else {
           // update for local device only
-          // FIXME: dump owner
-          newComment.user = SecretKeys.owner;
+          newComment.user = owner;
 
           setState(() {
             comments.add(newComment);
@@ -105,6 +109,7 @@ class _CommentPageState extends State<CommentPage> {
         }
       } catch (err) {
         Alert(
+                context: context,
                 title: 'Lỗi',
                 content: Text(
                   'Không gởi được',
@@ -237,7 +242,9 @@ class _CommentPageState extends State<CommentPage> {
               ),
               onPressed: () {
                 // Send comment implement
-                if (cmtController.text.isEmpty) {
+                if (owner == null) {
+                  LoginAlert(context: context, title: 'Đăng nhập').alert.show();
+                } else if (cmtController.text.isEmpty) {
                   Alert(
                     context: context,
                     closeFunction: () {},

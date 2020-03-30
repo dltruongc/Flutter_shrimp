@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:shrimpapp/components/account_bar.dart';
 import 'package:shrimpapp/components/loading_screen.dart';
 import 'package:shrimpapp/constants.dart';
+import 'package:shrimpapp/controllers/auth_controller.dart';
 import 'package:shrimpapp/controllers/favorite_controller.dart';
 import 'package:shrimpapp/controllers/newfeed_controller.dart';
 import 'package:shrimpapp/models/Account.dart';
@@ -20,13 +21,8 @@ import 'package:shrimpapp/providers/address_provider.dart';
 import 'package:shrimpapp/screens/comment_page.dart';
 import 'package:shrimpapp/screens/newfeed_editor.dart';
 import 'package:shrimpapp/utils/DateFormatter.dart';
+import 'package:shrimpapp/widgets/login_alert.dart';
 import 'package:shrimpapp/widgets/slider_images.dart';
-
-// FIXME: dump auth token string;
-final String authToken =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlN2Q5NDY4ZjcxNWIxMzA2N2EzMGY2NiIsImlhdCI6MTU4NTI4ODM0N30.EaIU0XqxemQSTW6nZhmCTeRZhfQBi8LKxCbnSf7s5ZU';
-
-final String accountId = "5e7d9468f715b13067a30f66";
 
 class NewFeedPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -37,18 +33,19 @@ class NewFeedPage extends StatelessWidget {
         builder: (context) => NewFeedEditor(),
       ),
     );
-    _scaffoldKey.currentState
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            'Đang tải lên...',
-            style: TextStyle(color: Colors.black),
+    if (result != null && result['data'] == true) {
+      _scaffoldKey.currentState
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              'Đang tải lên...',
+              style: TextStyle(color: Colors.black),
+            ),
+            backgroundColor: Colors.yellow.shade300,
           ),
-          backgroundColor: Colors.yellow.shade300,
-        ),
-      );
-
-    handle(result['feed'], result['images'], context);
+        );
+      handle(result['feed'], result['images'], context);
+    }
   }
 
   handle(NewFeed feed, List<Asset> images, BuildContext context) async {
@@ -80,15 +77,14 @@ class NewFeedPage extends StatelessWidget {
           ', ' +
           address.adminArea;
     } catch (e) {
-      addressString = 'ple ple ple';
+      addressString = 'Việt nam';
     }
 
     feed.images = bufferResults;
     feed.newFeedLocation = addressString;
 
-    // FIXME: Dump create alter
     try {
-      NewFeed x = await Provider.of<NewFeedController>(context, listen: false)
+      await Provider.of<NewFeedController>(context, listen: false)
           .createNewFeed(feed);
       _scaffoldKey.currentState
         ..removeCurrentSnackBar()
@@ -126,9 +122,7 @@ class NewFeedPage extends StatelessWidget {
         final List<NewFeed> newfeeds = controller.getAll();
         return RefreshIndicator(
           onRefresh: () async {
-            // await Future.delayed(Duration(seconds: 3));
-            Provider.of<NewFeedController>(context, listen: false)
-                .dumpCreateNewFeed();
+            controller.clear();
           },
           child: ListView.builder(
             itemCount:
@@ -150,7 +144,15 @@ class NewFeedPage extends StatelessWidget {
       }),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          floatSubmit(buildContext);
+          if (Provider.of<AuthController>(_scaffoldKey.currentContext,
+                      listen: false)
+                  .owner ==
+              null) {
+            LoginAlert(context: _scaffoldKey.currentContext, title: 'Đăng nhập')
+                .alert
+                .show();
+          } else
+            floatSubmit(buildContext);
         },
         backgroundColor: kDeepColor,
         heroTag: 'post-editor',
@@ -200,6 +202,33 @@ class _NewFeedItemState extends State<NewFeedItem> {
 
   @override
   Widget build(BuildContext context) {
+    Future<void> likeController() async {
+      try {
+        Account owner =
+            Provider.of<AuthController>(context, listen: false).owner;
+        final String authToken = owner.token;
+        final String accountId = owner.id;
+        if (!like) {
+          Provider.of<FavoriteController>(context, listen: false)
+              .like(authToken, widget.newFeed.id, accountId);
+          Provider.of<FavoriteController>(context, listen: false)
+              .fetchAnnouce(accountId);
+          setState(() {
+            like = true;
+          });
+        } else {
+          final unlike =
+              await Provider.of<FavoriteController>(context, listen: false)
+                  .unLike(authToken, widget.newFeed.id, accountId);
+          Provider.of<FavoriteController>(context, listen: false)
+              .fetchAnnouce(accountId);
+          setState(() {
+            like = unlike ? false : like;
+          });
+        }
+      } catch (err) {}
+    }
+
     return Container(
       child: Column(
         children: <Widget>[
@@ -245,7 +274,7 @@ class _NewFeedItemState extends State<NewFeedItem> {
               : SizedBox(),
           // Interactive post buttons
           SizedBox(height: 4.0),
-          // TODO: update feature
+          // TODO: newfeed views
           // Align(
           //   alignment: AlignmentDirectional.centerStart,
           //   child: Padding(
@@ -273,27 +302,7 @@ class _NewFeedItemState extends State<NewFeedItem> {
               children: <Widget>[
                 FlatButton.icon(
                   padding: const EdgeInsets.all(0.0),
-                  onPressed: () async {
-                    if (!like) {
-                      Provider.of<FavoriteController>(context, listen: false)
-                          .like(authToken, widget.newFeed.id, accountId);
-                      Provider.of<FavoriteController>(context, listen: false)
-                          .fetchAnnouce(accountId);
-                      setState(() {
-                        like = true;
-                      });
-                    } else {
-                      final unlike = await Provider.of<FavoriteController>(
-                              context,
-                              listen: false)
-                          .unLike(authToken, widget.newFeed.id, accountId);
-                      Provider.of<FavoriteController>(context, listen: false)
-                          .fetchAnnouce(accountId);
-                      setState(() {
-                        like = unlike ? false : like;
-                      });
-                    }
-                  },
+                  onPressed: likeController,
                   icon: like
                       ? Icon(
                           FontAwesomeIcons.solidThumbsUp,
