@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shrimpapp/constants.dart';
 import 'package:shrimpapp/controllers/auth_controller.dart';
 import 'package:shrimpapp/models/Account.dart';
@@ -16,14 +17,14 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _emailInput = TextEditingController();
-
   TextEditingController _passWordInput = TextEditingController();
 
   FocusNode _emailFocus = FocusNode();
-
   FocusNode _passwordFocus = FocusNode();
 
+  bool _isPending = false;
   bool _showPassword = false;
+  bool _autoValidate = false;
 
   Widget _showPasswordFnc() {
     return GestureDetector(
@@ -39,11 +40,16 @@ class _LoginPageState extends State<LoginPage> {
 
   onLogin() async {
     try {
-      Response res = await Dio().post('$kServerApiUrl/accounts/login', data: {
+      // Duplicate requests limited
+      setState(() {
+        _isPending = true;
+      });
+
+      Response res = await Dio(BaseOptions(connectTimeout: 3000))
+          .post('$kServerApiUrl/accounts/login', data: {
         'accountUserName': _emailInput.text,
         'accountPassword': _passWordInput.text
       });
-
       if (res.statusCode == 200) {
         Account logedAccount = Account.fromJson(res.data['user']);
 
@@ -52,22 +58,30 @@ class _LoginPageState extends State<LoginPage> {
         Provider.of<AuthController>(context, listen: false)
             .setOwner(logedAccount);
         Navigator.of(context).pop();
-      } else {
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('accountId', logedAccount.id);
+        prefs.setString('token', logedAccount.token);
+      }
+    } on DioError catch (err) {
+      if (err.type == DioErrorType.RESPONSE) {
         Alert(
           context: context,
-          title: 'Lỗi',
-          content: Text(res.data['message']),
+          title: 'Đăng nhập thất bại!',
+          content: Text(err.response.data['message'] ?? ''),
           type: AlertType.error,
         ).show();
-      }
-    } catch (err) {
-      Alert(
-        context: context,
-        title: 'Lỗi',
-        content: Text(err.response.data['message']),
-        type: AlertType.error,
-      ).show();
+      } else if (err.type == DioErrorType.CONNECT_TIMEOUT)
+        Alert(
+          context: context,
+          title: 'Mất kết nối',
+          content: Text('Không kết nối được với hệ thống!'),
+          type: AlertType.error,
+        ).show();
     }
+    setState(() {
+      _isPending = false;
+    });
   }
 
   @override
@@ -104,6 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                       )
                     ]),
                 child: Form(
+                  autovalidate: _autoValidate,
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,9 +184,18 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   GestureDetector(
                     onTap: () async {
-                      if (_formKey.currentState.validate()) {
+                      if (_isPending) {
+                        Alert(
+                          context: context,
+                          title: 'Đang gởi...',
+                          type: AlertType.warning,
+                        ).show();
+                      } else if (_formKey.currentState.validate()) {
                         await onLogin();
-                      }
+                      } else
+                        setState(() {
+                          _autoValidate = true;
+                        });
                     },
                     child: Container(
                       height: 60,

@@ -38,15 +38,20 @@ class NewFeedController extends ChangeNotifier {
           try {
             results[i].user =
                 accounts.firstWhere((e) => e.id == results[i].accountId);
-          } catch (e) {}
+          } catch (e) {
+            print(e);
+          }
         }
+
         _newFeeds.addAll(results);
         newFeedProvider.addAll(results);
       }
 
+      if (results == null || results.length < _limit * page) hasMore = false;
+
       notifyListeners();
     } catch (err) {
-      notifyListeners();
+      // notifyListeners();
     }
   }
 
@@ -172,17 +177,13 @@ class NewFeedController extends ChangeNotifier {
 
   List<NewFeed> getAll() => [...this._newFeeds];
 
-  Future createNewFeed(NewFeed feed) async {
+  Future createNewFeed(NewFeed feed, String token) async {
     Response res = await Dio().post(
       '$kServerApiUrl/newfeeds',
       data: feed.toMap(),
       options: new Options(
           contentType: "application/x-www-form-urlencoded",
-          headers: {
-            'charset': 'utf-8',
-            'Authorization':
-                'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlMWI2YTZmNmRmMDViYThiMzBlYTYyYSIsImlhdCI6MTU4NDgxMzgwNX0.qFCLBfdk1ps8GqrEUmjr_Ou2DLhPlUWYwimWY6cO8vQ'
-          }),
+          headers: {'charset': 'utf-8', 'Authorization': 'Bearer ' + token}),
     );
 
     final NewFeed output = NewFeed.fromMap(res.data['data']);
@@ -190,7 +191,6 @@ class NewFeedController extends ChangeNotifier {
     AccountController accountController = AccountController();
     output.user = await accountController.fetchAccount(output.accountId);
     _newFeeds.insert(0, output);
-    this._newFeeds.add(output);
 
     notifyListeners();
   }

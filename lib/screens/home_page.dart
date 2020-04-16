@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import 'package:shrimpapp/components/reusable_card.dart';
 import 'package:shrimpapp/constants.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shrimpapp/controllers/auth_controller.dart';
 import 'package:shrimpapp/controllers/favorite_controller.dart';
+import 'package:shrimpapp/controllers/newfeed_controller.dart';
+import 'package:shrimpapp/models/NewFeed.dart';
+import 'package:shrimpapp/providers/address_provider.dart';
 import 'package:shrimpapp/screens/environment_page.dart';
 import 'package:shrimpapp/screens/favorite_page.dart';
 import 'package:shrimpapp/screens/login_page.dart';
@@ -13,26 +17,69 @@ import 'package:shrimpapp/screens/newfeed_page.dart';
 import 'package:shrimpapp/screens/news_page.dart';
 import 'package:shrimpapp/screens/register_page.dart';
 import 'package:shrimpapp/screens/weather.dart';
+import 'package:shrimpapp/utils/image_to_buffer.dart';
 import 'package:shrimpapp/widgets/login_alert.dart';
-import '../widgets/audio_player.dart';
-import 'login_require.dart';
-import 'price_page.dart';
+import 'package:shrimpapp/widgets/audio_player.dart';
+import 'package:shrimpapp/screens/price_page.dart';
 
 class MyApp extends StatefulWidget {
+  static const String route = '/myapp';
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _currentIndex = 1;
-  final _widgets = [
-    WeatherWidget(),
-    HomePage(),
-    FavoritePage(),
-  ];
+
+  handle(NewFeed feed, List<Asset> images) async {
+    List<String> bufferResults = await ImageToBuffer.fromAssets(images);
+
+    feed.images = bufferResults;
+    feed.newFeedLocation = await AddressProvider().getCurrentLocation();
+    try {
+      final loginAccount =
+          Provider.of<AuthController>(context, listen: false).owner;
+      final newFeedController =
+          Provider.of<NewFeedController>(context, listen: false);
+      await newFeedController.createNewFeed(feed, loginAccount.token);
+      _scaffoldKey.currentState
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('Bài viết mới đã được đăng'),
+            backgroundColor: Colors.lightGreen,
+          ),
+        );
+      Provider.of<FavoriteController>(context, listen: false)
+          .fetchAnnouce(loginAccount.id);
+    } catch (err) {
+      print('ERROR: $err');
+      try {
+        _scaffoldKey.currentState
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text('Đăng bài thất bại.'),
+              backgroundColor: Colors.red.shade400,
+            ),
+          );
+      } catch (er) {
+        print("Show snackbar error!!\n$er");
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final _widgets = [
+      WeatherWidget(),
+      HomePage(handle: handle),
+      FavoritePage(),
+    ];
+
     return Scaffold(
+      key: _scaffoldKey,
       body: _widgets[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: [
@@ -51,20 +98,20 @@ class _MyAppState extends State<MyApp> {
         ],
         currentIndex: _currentIndex,
         onTap: (int index) {
-          setState(() {
-            if (index == 2) {
-              if (Provider.of<AuthController>(context, listen: false).owner ==
-                  null) {
-                LoginAlert(context: context, title: 'Đăng nhập').alert.show();
-              } else {
-                Provider.of<FavoriteController>(context, listen: false)
-                    .feeds
-                    .clear();
+          if (index == 2) {
+            if (Provider.of<AuthController>(context, listen: false).owner ==
+                null) {
+              LoginAlert(context: context, title: 'Đăng nhập').alert.show();
+            } else {
+              Provider.of<FavoriteController>(context, listen: false).clear();
+              setState(() {
                 _currentIndex = 2;
-              }
-            } else
+              });
+            }
+          } else
+            setState(() {
               _currentIndex = index;
-          });
+            });
         },
       ),
     );
@@ -73,6 +120,10 @@ class _MyAppState extends State<MyApp> {
 
 class HomePage extends StatelessWidget {
   static const route = '/home';
+  final Function handle;
+
+  HomePage({Key key, this.handle}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,8 +197,12 @@ class HomePage extends StatelessWidget {
                                 ],
                               ),
                               onPress: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => NewFeedPage()));
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        NewFeedPage(handle: handle),
+                                  ),
+                                );
                               },
                             ),
                           ),
@@ -167,8 +222,11 @@ class HomePage extends StatelessWidget {
                                 ],
                               ),
                               onPress: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => EnvironmentPage()));
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => EnvironmentPage(),
+                                  ),
+                                );
                               },
                             ),
                           ),

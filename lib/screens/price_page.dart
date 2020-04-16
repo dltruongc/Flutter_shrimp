@@ -12,9 +12,6 @@ import '../models/ShrimpSize.dart';
 import '../models/ShrimpType.dart';
 
 class PricePage extends StatefulWidget {
-  List<ShrimpPrice> prices;
-  List<ShrimpType> shrimpTypes;
-  List<ShrimpSize> shrimpSizes;
   @override
   _PricePageState createState() => _PricePageState();
 }
@@ -48,49 +45,27 @@ class _PricePageState extends State<PricePage> {
     );
   }
 
-  Widget subTitleNotification() {
-    return Container(
-      padding: const EdgeInsets.all(10.0),
-      child: Column(
-        children: <Widget>[
-          Center(
-            child: Text(
-              'gia tom hien nay...',
-              style: TextStyle(fontSize: 24),
-            ),
-          ),
-          Center(
-            child: Text(
-              'gia tom hien nay...',
-              style: TextStyle(fontSize: 24),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (widget.prices == null) {
+    if (prices == null) {
       ShrimpPriceController().fetchAll().then((data) {
-        widget.prices = data;
+        prices = data;
         setState(() {
           prices = data;
         });
       });
     }
-    if (widget.shrimpSizes == null) {
+    if (shrimpSizes == null) {
       ShrimpSizeController().fetchAll().then((data) {
-        widget.shrimpSizes = data;
+        shrimpSizes = data;
         setState(() {
           shrimpSizes = data;
         });
       });
     }
-    if (widget.shrimpTypes == null) {
+    if (shrimpTypes == null) {
       ShrimpTypeController().fetchAll().then((data) {
-        widget.shrimpTypes = data;
+        shrimpTypes = data;
         setState(() {
           shrimpTypes = data;
         });

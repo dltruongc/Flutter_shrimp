@@ -1,31 +1,28 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:geocoder/geocoder.dart';
+import 'package:flutter/rendering.dart';
 import 'package:loading_animations/loading_animations.dart';
-import 'package:location/location.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:shrimpapp/components/account_bar.dart';
+
 import 'package:shrimpapp/components/loading_screen.dart';
-import 'package:shrimpapp/constants.dart';
 import 'package:shrimpapp/controllers/auth_controller.dart';
 import 'package:shrimpapp/controllers/favorite_controller.dart';
 import 'package:shrimpapp/controllers/newfeed_controller.dart';
 import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/models/NewFeed.dart';
 import 'package:shrimpapp/providers/address_provider.dart';
-import 'package:shrimpapp/screens/comment_page.dart';
+import 'package:shrimpapp/screens/home_page.dart';
 import 'package:shrimpapp/screens/newfeed_editor.dart';
-import 'package:shrimpapp/utils/DateFormatter.dart';
+import 'package:shrimpapp/utils/image_to_buffer.dart';
 import 'package:shrimpapp/widgets/login_alert.dart';
-import 'package:shrimpapp/widgets/slider_images.dart';
+import 'package:shrimpapp/widgets/account_banner.dart';
+import 'package:shrimpapp/widgets/newfeed_item.dart';
 
 class NewFeedPage extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final Function handle;
+
+  NewFeedPage({Key key, this.handle}) : super(key: key);
 
   void floatSubmit(BuildContext context) async {
     Map<String, dynamic> result = await Navigator.of(context).push(
@@ -34,76 +31,33 @@ class NewFeedPage extends StatelessWidget {
       ),
     );
     if (result != null && result['data'] == true) {
-      _scaffoldKey.currentState
-        ..showSnackBar(
-          SnackBar(
-            content: Text(
-              'Đang tải lên...',
-              style: TextStyle(color: Colors.black),
+      try {
+        _scaffoldKey.currentState
+          ..showSnackBar(
+            SnackBar(
+              content: Text(
+                'Đang tải lên...',
+                style: TextStyle(color: Colors.black),
+              ),
+              backgroundColor: Colors.yellow.shade300,
             ),
-            backgroundColor: Colors.yellow.shade300,
-          ),
-        );
-      handle(result['feed'], result['images'], context);
+          );
+      } catch (er) {
+        print("Show snackbar error!!");
+      }
+      // FIXME
+      handle(result['feed'], result['images']);
     }
   }
 
-  handle(NewFeed feed, List<Asset> images, BuildContext context) async {
-    // Convert images to base64
-    Iterable<Future<String>> buffers = images.map((img) async {
-      print('${img.originalHeight} / ${img.originalWidth}');
-      print('1024 / ${(1024 * img.originalWidth) ~/ img.originalHeight}');
-      ByteData x = await img.getThumbByteData(
-          (1024 * img.originalWidth) ~/ img.originalHeight, 1024);
-      return base64Encode(x.buffer.asUint8List());
-    });
-
-    Future<List<String>> futureList = Future.wait(buffers);
-
-    List<String> bufferResults = await futureList;
-
-    // find current location
-    final Location location = Location();
-    LocationData locationData = await location.getLocation();
-    String addressString;
-
-    try {
-      List<Address> addressData = await AddressProvider()
-          .fetchAddress(locationData.latitude, locationData.latitude);
-      Address address = addressData.first;
-      addressString = address.featureName +
-          ', ' +
-          address.subAdminArea +
-          ', ' +
-          address.adminArea;
-    } catch (e) {
-      addressString = 'Việt nam';
-    }
-
-    feed.images = bufferResults;
-    feed.newFeedLocation = addressString;
-
-    try {
-      await Provider.of<NewFeedController>(context, listen: false)
-          .createNewFeed(feed);
-      _scaffoldKey.currentState
-        ..removeCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text('Bài viết mới đã được đăng'),
-            backgroundColor: Colors.lightGreen,
-          ),
-        );
-    } catch (err) {
-      _scaffoldKey.currentState
-        ..removeCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text('Đăng bài thất bại.'),
-            backgroundColor: Colors.red.shade400,
-          ),
-        );
-    }
+  createFeed(Account owner, BuildContext buildContext) {
+    if (owner == null) {
+      LoginAlert(
+        context: _scaffoldKey.currentContext,
+        title: 'Đăng nhập',
+      ).alert.show();
+    } else
+      floatSubmit(buildContext);
   }
 
   @override
@@ -114,253 +68,55 @@ class NewFeedPage extends StatelessWidget {
         title: Text('Hỏi đáp'),
         centerTitle: true,
       ),
-      body: Consumer<NewFeedController>(builder: (context, controller, _) {
-        if (controller.length <= 0) {
-          Provider.of<NewFeedController>(context, listen: false).fetchTop();
-          return LoadingScreen();
-        }
-        final List<NewFeed> newfeeds = controller.getAll();
-        return RefreshIndicator(
-          onRefresh: () async {
-            controller.clear();
-          },
-          child: ListView.builder(
-            itemCount:
-                controller.hasMore ? newfeeds.length + 1 : controller.length,
-            itemBuilder: (BuildContext context, int index) {
-              if (index >= newfeeds.length && controller.hasMore) {
-                Provider.of<NewFeedController>(context, listen: false)
-                    .fetchTop();
-                return LoadingFadingLine.circle();
-              }
+      body: Consumer<NewFeedController>(
+        builder: (context, controller, _) {
+          Account owner =
+              Provider.of<AuthController>(context, listen: false).owner;
 
-              return NewFeedItem(
-                newFeed: newfeeds[index],
-                owner: newfeeds[index].user,
-              );
+          if (controller.length <= 0 && controller.hasMore) {
+            controller.fetchTop();
+            return LoadingScreen();
+          }
+
+          final List<NewFeed> newfeeds = controller.getAll();
+          return RefreshIndicator(
+            onRefresh: () async {
+              controller.clear();
+              controller.fetchTop();
+              return LoadingScreen();
             },
-          ),
-        );
-      }),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (Provider.of<AuthController>(_scaffoldKey.currentContext,
-                      listen: false)
-                  .owner ==
-              null) {
-            LoginAlert(context: _scaffoldKey.currentContext, title: 'Đăng nhập')
-                .alert
-                .show();
-          } else
-            floatSubmit(buildContext);
-        },
-        backgroundColor: kDeepColor,
-        heroTag: 'post-editor',
-        child: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Image.asset(
-            'images/add_icon.png',
-            fit: BoxFit.contain,
-            color: Colors.white.withAlpha(180),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class NewFeedItem extends StatefulWidget {
-  final NewFeed newFeed;
-  final Account owner;
-
-  NewFeedItem(
-      {Key key, @required this.newFeed, @required this.owner, like = false})
-      : super(key: key);
-
-  @override
-  _NewFeedItemState createState() => _NewFeedItemState();
-}
-
-class _NewFeedItemState extends State<NewFeedItem> {
-  bool like = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    Provider.of<FavoriteController>(context)
-        .findFeed(widget.newFeed.id, widget.owner.id)
-        .then((found) {
-      setState(() {
-        like = found;
-      });
-    }).catchError((err) {
-      setState(() {
-        like = false;
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Future<void> likeController() async {
-      try {
-        Account owner =
-            Provider.of<AuthController>(context, listen: false).owner;
-        final String authToken = owner.token;
-        final String accountId = owner.id;
-        if (!like) {
-          Provider.of<FavoriteController>(context, listen: false)
-              .like(authToken, widget.newFeed.id, accountId);
-          Provider.of<FavoriteController>(context, listen: false)
-              .fetchAnnouce(accountId);
-          setState(() {
-            like = true;
-          });
-        } else {
-          final unlike =
-              await Provider.of<FavoriteController>(context, listen: false)
-                  .unLike(authToken, widget.newFeed.id, accountId);
-          Provider.of<FavoriteController>(context, listen: false)
-              .fetchAnnouce(accountId);
-          setState(() {
-            like = unlike ? false : like;
-          });
-        }
-      } catch (err) {}
-    }
-
-    return Container(
-      child: Column(
-        children: <Widget>[
-          // Account card
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: AccountBar(
-              account: widget.owner,
-              subTitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Text(widget.newFeed.newFeedLocation ?? ''),
-                  Text(
-                    DateFormatter.toVietNamString(widget.newFeed.createdAt),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // NewFeed content
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Text(
-                  widget.newFeed.title,
-                  style: Theme.of(context).textTheme.title,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: MarkdownBody(
-                    data: widget.newFeed.newFeedContent,
-                    styleSheetTheme: MarkdownStyleSheetBaseTheme.material,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          widget.newFeed.images.length > 0
-              ? SliderImages(images: widget.newFeed.images)
-              : SizedBox(),
-          // Interactive post buttons
-          SizedBox(height: 4.0),
-          // TODO: newfeed views
-          // Align(
-          //   alignment: AlignmentDirectional.centerStart,
-          //   child: Padding(
-          //     padding: const EdgeInsets.all(8.0),
-          //     child: Text(
-          //       '${widget.newFeed.favorites} lượt quan tâm',
-          //       style: Theme.of(context).textTheme.subtitle,
-          //     ),
-          //   ),
-          // ),
-          Container(
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(
-                  color: Colors.grey.shade500,
-                  width: 0.5,
-                  style: BorderStyle.solid,
-                ),
-              ),
-            ),
-            margin: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 0.0),
-            height: 32.0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                FlatButton.icon(
-                  padding: const EdgeInsets.all(0.0),
-                  onPressed: likeController,
-                  icon: like
-                      ? Icon(
-                          FontAwesomeIcons.solidThumbsUp,
-                          size: 20.0,
-                          color: Colors.blue.shade400,
-                        )
-                      : Icon(
-                          FontAwesomeIcons.thumbsUp,
-                          size: 20.0,
-                          color: Colors.black54,
-                        ),
-                  label: Text(
-                    'Quan tâm',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-                FlatButton.icon(
-                  padding: const EdgeInsets.all(0.0),
+                AccountBanner(
                   onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => CommentPage(widget.newFeed),
-                      ),
-                    );
+                    createFeed(owner, buildContext);
                   },
-                  icon: Icon(
-                    FontAwesomeIcons.commentAlt,
-                    size: 20.0,
-                    color: Colors.black54,
-                  ),
-                  label: Text(
-                    'Bình luận',
-                    style: TextStyle(color: Colors.black),
-                  ),
+                  profilePhoto: owner != null ? owner.profilePhoto : null,
                 ),
-                FlatButton.icon(
-                  padding: const EdgeInsets.all(0.0),
-                  onPressed: () {},
-                  icon: Icon(
-                    FontAwesomeIcons.share,
-                    size: 20.0,
-                    color: Colors.black54,
-                  ),
-                  label: Text(
-                    'Chia sẻ',
-                    style: TextStyle(color: Colors.black),
+                Expanded(
+                  child: ListView.builder(
+                    // shrinkWrap: true,
+                    // physics: ScrollPhysics(),
+                    itemCount: controller.hasMore
+                        ? newfeeds.length + 1
+                        : controller.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      if (index >= newfeeds.length && controller.hasMore) {
+                        controller.fetchTop();
+                        return LoadingFadingLine.circle();
+                      }
+
+                      return NewFeedItem(
+                        newFeed: newfeeds[index],
+                        owner: newfeeds[index].user,
+                      );
+                    },
                   ),
                 ),
               ],
             ),
-          ),
-
-          Divider(
-            height: 10.0,
-            thickness: 10.0,
-            color: Colors.grey.shade300,
-          )
-        ],
+          );
+        },
       ),
     );
   }

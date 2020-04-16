@@ -6,7 +6,6 @@ import '../components/paragraph.dart';
 import '../models/Sensor.dart';
 
 class EnvironmentPage extends StatefulWidget {
-  List<Sensor> sensors;
   @override
   _EnvironmentPageState createState() => _EnvironmentPageState();
 }
@@ -14,17 +13,52 @@ class EnvironmentPage extends StatefulWidget {
 class _EnvironmentPageState extends State<EnvironmentPage> {
   List<Sensor> sensors;
   dynamic salinity;
-  @override
-  Widget build(BuildContext context) {
-    if (widget.sensors == null) {
+
+  getInfo() {
+    if (sensors != null && sensors.isNotEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            content: Row(
+              children: <Widget>[
+                CircularProgressIndicator(),
+                SizedBox(
+                  width: 16.0,
+                ),
+                Text("Đang tải")
+              ],
+            ),
+            elevation: 16,
+          );
+        },
+      );
       SensorController().fetchNew().then((data) {
-        widget.sensors = data;
+        sensors = data;
+        setState(() {
+          sensors = data;
+          salinity = sensors
+              .firstWhere((sensor) => sensor.type == SensorType.Salinity);
+        });
+      }).whenComplete(() {
+        Navigator.of(context).pop();
+      });
+    } else
+      SensorController().fetchNew().then((data) {
+        sensors = data;
         setState(() {
           sensors = data;
           salinity = sensors
               .firstWhere((sensor) => sensor.type == SensorType.Salinity);
         });
       });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (sensors == null) {
+      getInfo();
     }
 
     if (sensors == null) {
@@ -47,7 +81,7 @@ class _EnvironmentPageState extends State<EnvironmentPage> {
               Icons.refresh,
               color: Colors.white,
             ),
-            onPressed: () {},
+            onPressed: getInfo,
           ),
         ],
       ),

@@ -12,14 +12,11 @@ class SensorController extends ChangeNotifier {
     try {
       final data = await http.get(SecretKeys.sensorUrl);
       final parsedJson = json.decode(data.body);
-      print(parsedJson);
-
       List<Sensor> sensors =
           parsedJson.map<Sensor>((item) => Sensor.fromMap(item)).toList();
-      print(sensors);
       return sensors;
     } catch (err) {
-      print(err);
+      print('Sensor error: $err');
       return null;
     }
   }

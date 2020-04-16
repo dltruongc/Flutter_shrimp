@@ -7,8 +7,9 @@ import 'account_bar.dart';
 class CommentBox extends StatelessWidget {
   final Comment comment;
   final TextEditingController controller;
+  final FocusNode focus;
 
-  CommentBox(this.comment, {this.controller});
+  CommentBox(this.comment, {@required this.controller, this.focus});
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +50,7 @@ class CommentBox extends StatelessWidget {
                   // TODO: implement reply
                   controller.text =
                       '**@${comment.user.fullName}** ${controller.text}';
+                  focus.requestFocus();
                 },
                 icon: Icon(
                   Icons.reply,

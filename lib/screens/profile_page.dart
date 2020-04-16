@@ -28,19 +28,34 @@ class AccountInfo extends StatelessWidget {
     );
   }
 
+  _researcherBuilder(Account account) {
+    return Column(
+      children: <Widget>[
+        // website
+        buildListTile(
+          'Chuyên môn',
+          FontAwesomeIcons.briefcase,
+          account.researcher.researcherSpecialized,
+        ),
+        // email
+        buildListTile(
+          'Viện nghiên cứu',
+          FontAwesomeIcons.school,
+          account.researcher.researcherOrganization,
+        ),
+        // city
+      ],
+    );
+  }
+
   ListTile buildListTile(String title, IconData icon, String subtitle) {
     return ListTile(
       title: Text(
-            title,
-            style: TextStyle(
-              //   color: Colors.black,
-              fontWeight: FontWeight.w500,
-              //   fontSize: 14.0,
-              //   letterSpacing: 1.2,
-              //   wordSpacing: 1.5,
-            ),
-          ) ??
-          '',
+        title ?? '',
+        style: TextStyle(
+          fontWeight: FontWeight.w500,
+        ),
+      ),
       subtitle: Text((subtitle) ?? ''),
       leading: Icon(
         icon,
@@ -147,6 +162,9 @@ class AccountInfo extends StatelessWidget {
                           : SizedBox(),
                       account.role.type == RoleTypes.retailer
                           ? _retailerBuilder(account)
+                          : SizedBox(),
+                      account.role.type == RoleTypes.researcher
+                          ? _researcherBuilder(account)
                           : SizedBox(),
                     ],
                   ),

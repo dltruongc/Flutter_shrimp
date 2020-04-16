@@ -53,8 +53,20 @@ class _NewsPageState extends State<NewsPage> {
   @override
   Widget build(BuildContext context) {
     if (newsData.length == 0) {
+      if (!_hasMore) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Tin tức'),
+          ),
+          body: Center(
+            child: Text('Không có dữ liệu',
+                style: Theme.of(context).textTheme.title),
+          ),
+        );
+      }
       return LoadingScreen();
     }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Tin tức'),

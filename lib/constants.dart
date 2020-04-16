@@ -12,4 +12,12 @@ final kServerUrl = SecretKeys.serverUrl;
 final kServerApiUrl = kServerUrl + '/api/v1';
 final kSensorUrl = SecretKeys.sensorUrl;
 
+final textFieldBorder = OutlineInputBorder(
+  borderRadius: BorderRadius.circular(12.0),
+  borderSide: BorderSide(
+    color: Colors.black26,
+    width: 0.5,
+  ),
+);
+
 enum ValidStatus { OK, ERROR }

@@ -60,6 +60,7 @@ class NewsController extends ChangeNotifier {
 
   void removeMany(int start, int end) {
     _articles.removeRange(start, end);
+    notifyListeners();
   }
 
   List<News> getAll() => [..._articles];

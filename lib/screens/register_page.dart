@@ -1,9 +1,15 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:flutter/services.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shrimpapp/components/submit_button.dart';
 import 'package:shrimpapp/constants.dart';
+import 'package:shrimpapp/models/Role.dart';
+import 'package:shrimpapp/widgets/avatar_picker.dart';
 import 'package:shrimpapp/widgets/farmer_edit.dart';
+import 'package:shrimpapp/widgets/researcher_editor.dart';
 import 'package:shrimpapp/widgets/retailer_edit.dart';
 import '../validation/input_validate.dart';
 
@@ -15,36 +21,220 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController _userNameCtrl = TextEditingController();
-  TextEditingController _passwordCtrl = TextEditingController();
-  TextEditingController _passwordRetypeCtrl = TextEditingController();
-  Asset image;
-  Asset coverImage;
+  final TextEditingController _userNameCtrl = TextEditingController();
+  final TextEditingController _passwordCtrl = TextEditingController();
+  final TextEditingController _passwordRetypeCtrl = TextEditingController();
+  final FocusNode usernameFocus = FocusNode();
+  final FocusNode passwordFocus = FocusNode();
+  final FocusNode passwordRetypeFocus = FocusNode();
+  File image;
+  File coverImage;
   bool _obscureText = true;
-
   bool _accountExisted = false;
+  bool _isPending = false;
+  bool _autoValidate = false;
+  RoleTypes _roleVal = RoleTypes.farmer;
 
-  Future<Asset> loadAssets() async {
-    List<Asset> resultList = List<Asset>();
-
-    try {
-      resultList = await MultiImagePicker.pickImages(
-        maxImages: 1,
-        enableCamera: true,
-        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
-        materialOptions: MaterialOptions(
-          actionBarColor: "#00A3B3",
-          actionBarTitle: "Chọn ảnh",
-          allViewTitle: "Tất cả",
-          useDetailsView: false,
-          selectCircleStrokeColor: "#000000",
-        ),
-      );
-    } on Exception catch (e) {
-      print('ERRRORRRRR: $e');
+  onSubmit() {
+    if (_roleVal == RoleTypes.farmer) {
+      onFarmer();
+    } else if (_roleVal == RoleTypes.farmer) {
+      onRetailer();
+    } else if (_roleVal == RoleTypes.researcher) {
+      onResearcher();
     }
-    if (!mounted) return null;
-    return resultList[0];
+  }
+
+  onResearcher() async {
+    setState(() {
+      _isPending = true;
+    });
+    try {
+      final base = BaseOptions(
+        connectTimeout: 5000,
+      );
+
+      Response res = await Dio(base).get(
+        '$kServerApiUrl/accounts?accountUserName=${_userNameCtrl.text}',
+      );
+
+      if (res.data['results'] > 0) {
+        setState(() {
+          _accountExisted = true;
+        });
+      } else {
+        setState(() {
+          _accountExisted = false;
+        });
+      }
+      if (_formKey.currentState.validate())
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => ResearcherEditorWidget(
+              this._userNameCtrl.text,
+              this._passwordCtrl.text,
+              this.image,
+              cover: this.coverImage,
+            ),
+          ),
+        );
+      else
+        setState(() {
+          _autoValidate = true;
+        });
+    } on DioError catch (res) {
+      if (res.type == DioErrorType.CONNECT_TIMEOUT) {
+        Alert(
+          context: context,
+          title: 'Mất kết nối',
+          content: Text('Không kết nối được với hệ thống'),
+          type: AlertType.error,
+        ).show();
+      } else {
+        Alert(
+          context: context,
+          title: 'Lỗi',
+          content: Text('Vui lòng thử lại sau!'),
+          type: AlertType.error,
+        ).show();
+      }
+    } on Exception catch (e) {
+      print(e);
+    }
+    setState(() {
+      _isPending = false;
+    });
+  }
+
+  onFarmer() async {
+    setState(() {
+      _isPending = true;
+    });
+    try {
+      final base = BaseOptions(
+        connectTimeout: 5000,
+      );
+
+      Response res = await Dio(base).get(
+        '$kServerApiUrl/accounts?accountUserName=${_userNameCtrl.text}',
+      );
+
+      if (res.data['results'] > 0) {
+        setState(() {
+          _accountExisted = true;
+        });
+      } else {
+        setState(() {
+          _accountExisted = false;
+        });
+      }
+      if (_formKey.currentState.validate())
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => FarmerEditorWidget(
+              this._userNameCtrl.text,
+              this._passwordCtrl.text,
+              this.image,
+              cover: this.coverImage,
+            ),
+          ),
+        );
+      else
+        setState(() {
+          _autoValidate = true;
+        });
+    } on DioError catch (res) {
+      if (res.type == DioErrorType.CONNECT_TIMEOUT) {
+        Alert(
+          context: context,
+          title: 'Mất kết nối',
+          content: Text('Không kết nối được với hệ thống'),
+          type: AlertType.error,
+        ).show();
+      } else {
+        Alert(
+          context: context,
+          title: 'Lỗi',
+          content: Text('Vui lòng thử lại sau!'),
+          type: AlertType.error,
+        ).show();
+      }
+    } on Exception catch (e) {
+      print(e);
+    }
+    setState(() {
+      _isPending = false;
+    });
+  }
+
+  onRetailer() async {
+    setState(() {
+      _isPending = true;
+    });
+    try {
+      Response res = await Dio(BaseOptions(connectTimeout: 5000))
+          .get('$kServerApiUrl/accounts?accountUserName=${_userNameCtrl.text}');
+      if (res.data['results'] > 0) {
+        setState(() {
+          _accountExisted = true;
+        });
+      } else {
+        setState(() {
+          _accountExisted = false;
+        });
+      }
+      if (_formKey.currentState.validate())
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => RetailerEditorWidget(
+              this._userNameCtrl.text,
+              this._passwordCtrl.text,
+              this.image,
+              cover: this.coverImage,
+            ),
+          ),
+        );
+      else
+        setState(() {
+          _autoValidate = true;
+        });
+    } on DioError catch (e) {
+      if (e.type == DioErrorType.CONNECT_TIMEOUT) {
+        Alert(
+          context: context,
+          title: 'Mất kết nối',
+          content: Text('Không kết nối được với hệ thống'),
+          type: AlertType.error,
+        ).show();
+      } else {
+        Alert(
+          context: context,
+          title: 'Lỗi',
+          type: AlertType.error,
+        ).show();
+      }
+    } on Exception catch (_) {
+      Alert(
+        context: context,
+        title: 'Lỗi',
+        content: Text(
+          'Xảy ra lỗi không xác định. Vui lòng kiểm tra dữ liệu nhập vào',
+        ),
+        type: AlertType.error,
+      ).show();
+    }
+
+    setState(() {
+      _isPending = false;
+    });
+  }
+
+  setImage(File img) {
+    this.image = img;
+  }
+
+  setCoverImage(File img) {
+    this.coverImage = img;
   }
 
   @override
@@ -58,7 +248,10 @@ class _RegisterPageState extends State<RegisterPage> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            _avatarPicker(),
+            AvatarPicker(
+              setImage: this.setImage,
+              setCoverImage: this.setCoverImage,
+            ),
             Card(
               color: Colors.teal.shade50,
               margin: const EdgeInsets.all(16.0),
@@ -69,11 +262,14 @@ class _RegisterPageState extends State<RegisterPage> {
                         horizontal: 16.0, vertical: 4.0),
                     child: Form(
                       key: _formKey,
+                      autovalidate: _autoValidate,
                       child: Column(
                         children: <Widget>[
                           //-------------------- username----------------
                           TextFormField(
                             controller: _userNameCtrl,
+                            autofocus: false,
+                            autocorrect: false,
                             decoration: InputDecoration(
                               labelText: 'Tên đăng nhập',
                               hintStyle: TextStyle(color: Colors.teal),
@@ -84,9 +280,17 @@ class _RegisterPageState extends State<RegisterPage> {
                                 ),
                               ),
                             ),
+                            focusNode: usernameFocus,
                             onChanged: (val) {
                               _accountExisted = false;
                             },
+                            onFieldSubmitted: (val) {
+                              usernameFocus.unfocus();
+
+                              FocusScope.of(context)
+                                  .requestFocus(passwordFocus);
+                            },
+                            keyboardType: TextInputType.text,
                             validator: (value) {
                               if (value.isEmpty) {
                                 return "Không được bỏ trống.";
@@ -104,6 +308,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           //---------------password------------------
                           TextFormField(
                             controller: _passwordCtrl,
+                            autofocus: false,
+                            autocorrect: false,
                             validator: (value) {
                               if (value.isEmpty) {
                                 return "Không được bỏ trống.";
@@ -134,9 +340,19 @@ class _RegisterPageState extends State<RegisterPage> {
                                 ),
                               ),
                             ),
+                            keyboardType: TextInputType.text,
+                            focusNode: passwordFocus,
+                            onFieldSubmitted: (val) {
+                              passwordFocus.unfocus();
+
+                              FocusScope.of(context)
+                                  .requestFocus(passwordRetypeFocus);
+                            },
                           ),
                           TextFormField(
                             controller: _passwordRetypeCtrl,
+                            autofocus: false,
+                            autocorrect: false,
                             validator: (value) {
                               if (value.isEmpty) {
                                 return "Không được bỏ trống.";
@@ -155,13 +371,38 @@ class _RegisterPageState extends State<RegisterPage> {
                               labelText: "Xác nhận mật khẩu",
                             ),
                             obscureText: true,
+                            keyboardType: TextInputType.text,
+                            focusNode: passwordRetypeFocus,
+                            onFieldSubmitted: (val) {
+                              passwordRetypeFocus.unfocus();
+                            },
                           ),
                           SizedBox(
                             height: 30.0,
                           ),
+
+                          DropdownButton(
+                            value: _roleVal,
+                            onChanged: (RoleTypes newRole) {
+                              setState(() {
+                                _roleVal = newRole;
+                              });
+                            },
+                            items: [
+                              RoleTypes.farmer,
+                              RoleTypes.retailer,
+                              RoleTypes.researcher
+                            ]
+                                .map(
+                                  (x) => DropdownMenuItem(
+                                    child: Text(toVietnam(x)),
+                                    value: x,
+                                  ),
+                                )
+                                .toList(),
+                          ),
                         ],
                       ),
-                      autovalidate: true,
                     ),
                   ),
                   Padding(
@@ -169,61 +410,17 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Row(
                       children: <Widget>[
                         SubmitButton(
-                          title: 'Nông dân',
-                          onPressed: () async {
-                            Response res = await Dio().get(
-                                '$kServerApiUrl/accounts?accountUserName=${_userNameCtrl.text}');
-                            if (res.data['results'] > 0) {
-                              setState(() {
-                                _accountExisted = true;
-                              });
+                          title: 'Đăng ký',
+                          onPressed: () {
+                            if (_isPending) {
+                              Alert(
+                                context: context,
+                                title: 'Đang gởi...',
+                                type: AlertType.warning,
+                              ).show();
                             } else {
-                              setState(() {
-                                _accountExisted = false;
-                              });
+                              onSubmit();
                             }
-                            if (_formKey.currentState.validate())
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (context) => FarmerEditorWidget(
-                                    this._userNameCtrl.text,
-                                    this._passwordCtrl.text,
-                                    this.image,
-                                    cover: this.coverImage,
-                                  ),
-                                ),
-                              );
-                          },
-                          height: 40,
-                        ),
-                        SizedBox(
-                          width: 20.0,
-                        ),
-                        SubmitButton(
-                          title: 'Đại lí',
-                          onPressed: () async {
-                            Response res = await Dio().get(
-                                '$kServerApiUrl/accounts?accountUserName=${_userNameCtrl.text}');
-                            if (res.data['results'] > 0) {
-                              setState(() {
-                                _accountExisted = true;
-                              });
-                            } else {
-                              setState(() {
-                                _accountExisted = false;
-                              });
-                            }
-                            if (_formKey.currentState.validate())
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (context) => RetailerEditorWidget(
-                                    this._userNameCtrl.text,
-                                    this._passwordCtrl.text,
-                                    this.image,
-                                    cover: this.coverImage,
-                                  ),
-                                ),
-                              );
                           },
                           height: 40,
                         ),
@@ -236,110 +433,6 @@ class _RegisterPageState extends State<RegisterPage> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _avatarPicker() {
-    return Stack(
-      children: <Widget>[
-        Container(
-          margin: const EdgeInsets.only(top: 0, bottom: 16),
-          height: 200,
-          width: double.infinity,
-          child: coverImage != null
-              ? AssetThumb(
-                  asset: coverImage,
-                  height: 200,
-                  width: MediaQuery.of(context).size.width ~/ 1,
-                )
-              : Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('images/weather_wall.png'),
-                      fit: BoxFit.cover,
-                      colorFilter: new ColorFilter.mode(
-                        Colors.teal.withOpacity(0.5),
-                        BlendMode.dstATop,
-                      ),
-                    ),
-                  ),
-                ),
-        ),
-        Container(
-          margin: const EdgeInsets.only(top: 20, bottom: 16),
-          height: 160,
-          width: 160,
-          child: Stack(
-            children: <Widget>[
-              image == null
-                  ? Container(
-                      height: 150,
-                      width: 150,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(150),
-                        border: Border.all(
-                          color: Colors.teal.shade400,
-                          width: 0.5,
-                        ),
-                      ),
-                      child: CircleAvatar(
-                        backgroundImage: AssetImage(
-                          'images/person.png',
-                        ),
-                        backgroundColor: Colors.teal.shade100.withAlpha(80),
-                      ),
-                    )
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(150),
-                      child: AssetThumb(
-                        asset: image,
-                        width: 150,
-                        height: 150,
-                      ),
-                    ),
-              Align(
-                alignment: AlignmentDirectional.bottomEnd,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(48),
-                    color: Color(0xff22B1A9),
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.camera_alt,
-                      color: Colors.white,
-                    ),
-                    onPressed: () async {
-                      // ImagePickAlert.alert(context, [image]).show();
-                      Asset x = await loadAssets();
-                      setState(() {
-                        image = x;
-                      });
-                    },
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-        Align(
-          alignment: AlignmentDirectional.topEnd,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 10.0, right: 16.0),
-            child: RaisedButton.icon(
-              icon: Icon(Icons.camera_enhance, color: Colors.white, size: 32.0),
-              label: Text('Ảnh nền', style: TextStyle(color: Colors.white)),
-              color: Colors.teal.shade300,
-              onPressed: () async {
-                Asset x = await loadAssets();
-                setState(() {
-                  coverImage = x;
-                });
-              },
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

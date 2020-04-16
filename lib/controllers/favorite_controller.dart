@@ -27,6 +27,13 @@ class FavoriteController extends ChangeNotifier {
     }
   }
 
+  clear() {
+    feeds.clear();
+    this.length = 0;
+    this.hasMore = true;
+    notifyListeners();
+  }
+
   Future fetchAnnouce(String accountId) async {
     try {
       final data =
@@ -34,14 +41,24 @@ class FavoriteController extends ChangeNotifier {
       final parsedJson = json.decode(data.body);
       announce = Announce.fromMap(parsedJson['data'].first);
       length = announce.favorites.length;
+      hasMore = announce.favorites.isNotEmpty;
     } catch (err) {
       print(err);
       length = 0;
     }
   }
 
-  Future fetchTop(String accountId) async {
+  Future<List<NewFeed>> fetchTop(String accountId) async {
     await fetchAnnouce(accountId);
+
+    if (announce.favorites.isEmpty) {
+      hasMore = false;
+      this.length = 0;
+      notifyListeners();
+
+      return [];
+    }
+
     List<NewFeed> news;
     try {
       news = await newFeedController
@@ -52,20 +69,16 @@ class FavoriteController extends ChangeNotifier {
 
     if (news != null && news.isNotEmpty)
       feeds = news;
-    else if (_limit > feeds.length) {
+    else if (_limit > news.length) {
       hasMore = false;
-      this.length = feeds.length;
+      this.length = news.length;
     }
-    if (!newFeedController.hasMore) {
-      hasMore = false;
-      this.length = feeds.length;
-    }
-    print('Announce From Top: ${announce.favorites}');
 
     notifyListeners();
+    return feeds;
   }
 
-  Future fetchNews(String accountId, int id) async {
+  Future<List<NewFeed>> fetchNews(String accountId, int id) async {
     await fetchAnnouce(accountId);
 
     List<String> ids = [];
@@ -83,13 +96,13 @@ class FavoriteController extends ChangeNotifier {
       hasMore = false;
       this.length = feeds.length;
     }
-    if (!newFeedController.hasMore) {
-      hasMore = false;
-      this.length = feeds.length;
-    }
-    print('Announce From IDs: ${announce.favorites}');
-
+    // if (newFeedController.hasMore) {
+    //   hasMore = false;
+    //   this.length = feeds.length;
+    // }
     notifyListeners();
+
+    return news.isNotEmpty ? news : [];
   }
 
   getAll() => feeds;
@@ -105,7 +118,12 @@ class FavoriteController extends ChangeNotifier {
         headers: {'charset': 'utf-8', 'Authorization': authToken},
       ),
     );
-    return result.statusCode == 200;
+
+    if (result.statusCode == 200) {
+      if (!announce.favorites.contains(feed)) announce.favorites.add(feed);
+      return true;
+    }
+    return false;
   }
 
   Future<bool> unLike(String authToken, String feed, String accountId) async {
@@ -121,7 +139,11 @@ class FavoriteController extends ChangeNotifier {
         headers: {'charset': 'utf-8', 'Authorization': authToken},
       ),
     );
-    return result.statusCode == 200;
+    if (result.statusCode == 200) {
+      announce.favorites.removeWhere((x) => x == feed);
+      return true;
+    }
+    return false;
   }
 
   // Future fetchTopFeeds(String accountId) async {

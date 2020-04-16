@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+
 import 'package:shrimpapp/components/account_bar.dart';
 import 'package:shrimpapp/components/comment_box.dart';
 import 'package:shrimpapp/constants.dart';
@@ -30,6 +31,7 @@ class _CommentPageState extends State<CommentPage> {
   List<Comment> comments = [];
   bool _hasMore = true;
   bool _isLoading = true;
+  FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -194,7 +196,11 @@ class _CommentPageState extends State<CommentPage> {
                         widget.commentController.hasMore) {
                       return LoadingFadingLine.circle();
                     }
-                    return CommentBox(comments[id], controller: cmtController);
+                    return CommentBox(
+                      comments[id],
+                      controller: cmtController,
+                      focus: _focusNode,
+                    );
                   },
                 ),
                 SizedBox(
@@ -206,6 +212,7 @@ class _CommentPageState extends State<CommentPage> {
         ),
       ),
       bottomSheet: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 4.0),
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border(
@@ -217,8 +224,9 @@ class _CommentPageState extends State<CommentPage> {
         ),
         child: TextField(
           onTap: () {
-            // Implement PostEditor page
+            // TODO: Implement PostEditor page
           },
+          focusNode: _focusNode,
           textInputAction: TextInputAction.newline,
           keyboardType: TextInputType.multiline,
           enableInteractiveSelection: true,
@@ -228,13 +236,13 @@ class _CommentPageState extends State<CommentPage> {
           enabled: true,
           controller: cmtController,
           decoration: InputDecoration(
-            hintText: ' Nhập bình luận...',
-            prefixIcon: IconButton(
-              icon: Icon(FontAwesomeIcons.camera),
-              onPressed: () {
-                // Camera pick comment implement
-              },
-            ),
+            hintText: 'Nhập bình luận...',
+//            prefixIcon: IconButton(
+//              icon: Icon(FontAwesomeIcons.camera),
+//              onPressed: () {
+//                // Camera pick comment implement
+//              },
+//            ),
             suffixIcon: IconButton(
               icon: Icon(
                 FontAwesomeIcons.paperPlane,
@@ -255,8 +263,6 @@ class _CommentPageState extends State<CommentPage> {
                     ),
                   ).show();
                 } else {
-                  //fsdf
-                  print('Alo');
                   _onSubmit();
                 }
               },

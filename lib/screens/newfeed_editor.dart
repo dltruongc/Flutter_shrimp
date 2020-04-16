@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shrimpapp/components/account_bar.dart';
 import 'package:shrimpapp/components/submit_button.dart';
 import 'package:shrimpapp/constants.dart';
@@ -19,11 +20,30 @@ class _NewFeedEditorState extends State<NewFeedEditor> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final FocusNode _contentFocus = FocusNode();
 
+  bool _isLoading = false;
+  bool _autoValidate = false;
+
   List<Asset> images = List<Asset>();
+  List thumb = [];
 
   Future<void> loadAssets() async {
+    _scaffoldKey.currentState.removeCurrentSnackBar();
+    _scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+        content: Text(
+          'Đang đọc ảnh!',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.orangeAccent.shade200,
+      ),
+    );
+    setState(() {
+      _isLoading = true;
+    });
+
     List<Asset> resultList = List<Asset>();
 
     try {
@@ -44,8 +64,18 @@ class _NewFeedEditorState extends State<NewFeedEditor> {
       print('ERRRORRRRR: $e');
     }
     if (!mounted) return;
+    _scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+        content: Text(
+          'Đọc ảnh thành công!',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.green.shade600,
+      ),
+    );
     setState(() {
       images = resultList;
+      _isLoading = false;
     });
   }
 
@@ -69,13 +99,24 @@ class _NewFeedEditorState extends State<NewFeedEditor> {
       title: _titleController.text,
       views: 0,
     );
-    Navigator.pop(context, {'feed': newFeed, 'images': images, 'data': true});
+
+    if (_isLoading) {
+      Alert(
+              context: context,
+              title: 'Vui lòng chờ',
+              content: Text('Đang xử lý ảnh'),
+              type: AlertType.info)
+          .show();
+    } else {
+      Navigator.pop(context, {'feed': newFeed, 'images': images, 'data': true});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     Account owner = Provider.of<AuthController>(context).owner;
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Soạn thảo'),
         centerTitle: true,
@@ -84,7 +125,10 @@ class _NewFeedEditorState extends State<NewFeedEditor> {
             onPressed: () {
               if (_formKey.currentState.validate()) {
                 onSubmit();
-              }
+              } else
+                setState(() {
+                  _autoValidate = true;
+                });
             },
             icon: Icon(
               Icons.check,
@@ -118,7 +162,7 @@ class _NewFeedEditorState extends State<NewFeedEditor> {
               ),
               Form(
                 key: _formKey,
-                autovalidate: true,
+                autovalidate: _autoValidate,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
