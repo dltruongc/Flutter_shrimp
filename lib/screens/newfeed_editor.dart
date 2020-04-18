@@ -218,6 +218,8 @@ class _NewFeedEditorState extends State<NewFeedEditor> {
                                 BorderSide(color: kLightColor, width: 0.5),
                           ),
                         ),
+                        onEditingComplete: () =>
+                            FocusScope.of(context).unfocus(),
                         validator: (val) {
                           return val.isEmpty ? 'Không được để trống!' : null;
                         },

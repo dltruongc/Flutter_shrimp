@@ -3,20 +3,20 @@ final Map<String, String> weatherWords = {
   'few clouds': 'ít mây',
   'scattered clouds': 'mây rải rác',
   'broken clouds': 'mây đen',
-  'shower rain': 'mưa nhanh',
+  'shower rain': 'mưa rào',
   'rain': 'mưa',
-  'light rain': 'mưa nhỏ',
+  'light rain': 'mưa nhẹ hạt',
   'drizzle': 'mưa phùn',
-  'thunderstorm with light rain': 'giông, mưa nhỏ',
-  'thunderstorm with rain': 'giông có mưa',
-  'thunderstorm with heavy rain': 'giông, mưa lớn',
+  'thunderstorm with light rain': 'giông, mưa nhẹ hạt',
+  'thunderstorm with rain': 'giông và mưa',
+  'thunderstorm with heavy rain': 'giông và mưa lớn',
   'light thunderstorm': 'giông nhẹ',
   'thunderstorm': 'giông bão',
-  'heavy thunderstorm': 'giông lớn',
-  'thunderstorm with light drizzle': 'giông, mưa phùn',
+  'heavy thunderstorm': 'giông bão lớn',
+  'thunderstorm with light drizzle': 'giông, kèm mưa phùn',
   'thunderstorm with drizzle': 'giông, mưa phùn',
-  'thunderstorm with light drizzle': 'giông, mưa phùn nhẹ',
-  'thunderstorm with drizzle': 'giông, mưa phùn nặng',
+  'thunderstorm with light drizzle': 'giông, kèm mưa phùn',
+  'thunderstorm with drizzle': 'giông kèm mưa phùn',
   'thunderstorm': 'sấm chớp',
   'snow': 'tuyết',
   'mist': 'sương',
@@ -24,10 +24,10 @@ final Map<String, String> weatherWords = {
   'heavy intensity rain': 'mưa to',
   'very heavy rain': 'mưa nặng hạt',
   'extreme rain': 'mưa rất to',
-  'freezing rain': 'mưa lạnh',
+  'freezing rain': 'mưa rét',
   'light intensity shower rain': 'mưa rào',
-  'heavy intensity shower rain': 'mưa nhanh nặng hạt',
-  'ragged shower rain': 'mưa thưa thớt',
+  'heavy intensity shower rain': 'mưa nặng hạt',
+  'ragged shower rain': 'mưa rải rác',
   'smoke': 'khói',
   'haze': 'sương mù',
   'dust': 'bụi',
@@ -62,7 +62,7 @@ final Map<String, String> iconWords = {
   '50n': 'sương mù',
 };
 
-class WeatherVietsub  {
+class WeatherVietsub {
   static String iconCode(String code) => iconWords[code.toLowerCase()];
   static String word(String word) => weatherWords[word.toLowerCase()];
 }

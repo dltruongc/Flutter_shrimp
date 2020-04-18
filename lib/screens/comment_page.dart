@@ -217,9 +217,10 @@ class _CommentPageState extends State<CommentPage> {
           color: Colors.white,
           border: Border(
             top: BorderSide(
-                color: Colors.grey.shade400,
-                width: 0.5,
-                style: BorderStyle.solid),
+              color: Colors.grey.shade400,
+              width: 0.5,
+              style: BorderStyle.solid,
+            ),
           ),
         ),
         child: TextField(
@@ -235,6 +236,9 @@ class _CommentPageState extends State<CommentPage> {
           keyboardAppearance: Brightness.dark,
           enabled: true,
           controller: cmtController,
+          onEditingComplete: () {
+            FocusScope.of(context).unfocus();
+          },
           decoration: InputDecoration(
             hintText: 'Nhập bình luận...',
 //            prefixIcon: IconButton(
