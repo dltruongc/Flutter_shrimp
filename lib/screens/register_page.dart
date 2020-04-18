@@ -376,6 +376,9 @@ class _RegisterPageState extends State<RegisterPage> {
                             onFieldSubmitted: (val) {
                               passwordRetypeFocus.unfocus();
                             },
+                            onEditingComplete: () {
+                              FocusScope.of(context).unfocus();
+                            },
                           ),
                           SizedBox(
                             height: 30.0,

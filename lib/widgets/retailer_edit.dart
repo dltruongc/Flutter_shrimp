@@ -228,6 +228,9 @@ class _RetailerEditorWidgetState extends State<RetailerEditorWidget> {
                             return null;
                           },
                           decoration: customInputDecoration("Thành phố"),
+                          onEditingComplete: () {
+                            FocusScope.of(context).unfocus();
+                          },
                         ),
                         SizedBox(height: 20.0),
                         Row(

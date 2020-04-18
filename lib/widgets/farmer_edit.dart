@@ -213,6 +213,9 @@ class _FarmerEditorWidgetState extends State<FarmerEditorWidget> {
                           enabledBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.black)),
                         ),
+                        onEditingComplete: () {
+                          FocusScope.of(context).unfocus();
+                        },
                       ),
                       SizedBox(height: 40.0),
                       Row(

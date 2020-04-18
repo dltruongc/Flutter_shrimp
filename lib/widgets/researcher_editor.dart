@@ -175,7 +175,8 @@ class _ResearcherEditorWidgetState extends State<ResearcherEditorWidget> {
                         keyboardAppearance: Brightness.dark,
                         enabled: true,
                         textInputAction: TextInputAction.next,
-                        decoration: customInputDecoration("Số điện thoại"),
+                        decoration: customInputDecoration("Số điện thoại"), keyboardType: TextInputType.phone,
+                        maxLength: 10,
                         validator: (value) {
                           if (value.isEmpty) {
                             return "Không được bỏ trống.";
@@ -216,24 +217,24 @@ class _ResearcherEditorWidgetState extends State<ResearcherEditorWidget> {
                           }
                           return null;
                         },
+                                                keyboardType: TextInputType.multiline,
                         decoration: customInputDecoration("Viện nghiên cứu"),
-                        keyboardType: TextInputType.phone,
-                        maxLength: 10,
+
                       ),
-                      TextField(
-                        controller: _storyCtrl,
-                        textInputAction: TextInputAction.newline,
-                        keyboardType: TextInputType.multiline,
-                        enableInteractiveSelection: true,
-                        minLines: null,
-                        maxLines: null,
-                        keyboardAppearance: Brightness.light,
-                        enabled: true,
-                        decoration: InputDecoration(
-                          labelText: 'Câu chuyện nông dân',
-                          hintText: 'Hãy nói gì đó để mọi người biết về bạn.',
-                        ),
-                      ),
+//                      TextField(
+//                        controller: _storyCtrl,
+//                        textInputAction: TextInputAction.newline,
+//                        keyboardType: TextInputType.multiline,
+//                        enableInteractiveSelection: true,
+//                        minLines: null,
+//                        maxLines: null,
+//                        keyboardAppearance: Brightness.light,
+//                        enabled: true,
+//                        decoration: InputDecoration(
+//                          labelText: 'Câu chuyện nông dân',
+//                          hintText: 'Hãy nói gì đó để mọi người biết về bạn.',
+//                        ),
+//                      ),
                       TextFormField(
                         controller: _addressCtrl,
                         textInputAction: TextInputAction.newline,
@@ -250,6 +251,9 @@ class _ResearcherEditorWidgetState extends State<ResearcherEditorWidget> {
                           enabledBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.black)),
                         ),
+                        onEditingComplete: () {
+                          FocusScope.of(context).unfocus();
+                        },
                       ),
                       SizedBox(height: 40.0),
                       Row(

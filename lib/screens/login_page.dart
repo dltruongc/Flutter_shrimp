@@ -170,6 +170,9 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         focusNode: _passwordFocus,
                         onFieldSubmitted: (val) {},
+                        onEditingComplete: () {
+                          FocusScope.of(context).unfocus();
+                        },
                       ),
                     ],
                   ),
