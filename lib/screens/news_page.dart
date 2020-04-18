@@ -108,10 +108,16 @@ class _NewsPageState extends State<NewsPage> {
                 newsData[id].title,
                 style: TextStyle(fontWeight: FontWeight.w500),
               ),
-              subtitle: Text(
-                newsData[id].url,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 4.0),
+                child: Text(
+                  newsData[id].url,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.black26,
+                  ),
+                ),
               ),
             ),
           );
