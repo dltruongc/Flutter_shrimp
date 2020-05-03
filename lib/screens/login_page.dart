@@ -44,8 +44,7 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _isPending = true;
       });
-
-      Response res = await Dio(BaseOptions(connectTimeout: 3000))
+      Response res = await Dio(BaseOptions(connectTimeout: 5000))
           .post('$kServerApiUrl/accounts/login', data: {
         'accountUserName': _emailInput.text,
         'accountPassword': _passWordInput.text
@@ -62,6 +61,10 @@ class _LoginPageState extends State<LoginPage> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('accountId', logedAccount.id);
         prefs.setString('token', logedAccount.token);
+      } else {
+        setState(() {
+          _isPending = false;
+        });
       }
     } on DioError catch (err) {
       if (err.type == DioErrorType.RESPONSE) {
@@ -78,191 +81,193 @@ class _LoginPageState extends State<LoginPage> {
           content: Text('Không kết nối được với hệ thống!'),
           type: AlertType.error,
         ).show();
+    } finally {
+      setState(() {
+        _isPending = false;
+      });
     }
-    setState(() {
-      _isPending = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomPadding: true,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 60.0),
-          child: Column(
-            children: <Widget>[
-              Image.asset(
-                "images/logoSTfarm.png",
-                fit: BoxFit.contain,
-              ),
-              SizedBox(
-                height: 50,
-              ),
-              Container(
-                height: 200,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        offset: Offset(0.0, 15.0),
-                        blurRadius: 15.0,
-                      ),
-                      BoxShadow(
-                        color: Colors.black12,
-                        offset: Offset(0.0, -10.0),
-                        blurRadius: 10.0,
-                      )
-                    ]),
-                child: Form(
-                  autovalidate: _autoValidate,
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      TextFormField(
-                        controller: _emailInput,
-                        validator: (val) {
-                          if (val.length == 0) return "Không được bỏ trống!";
-                          if (val.length < 5)
-                            return "Tên đăng nhập không hợp lệ";
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.black12),
-                          ),
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.green),
-                          ),
-                          filled: false,
-                          prefixIcon: Icon(Icons.account_circle),
-                          labelText: "Tên đăng nhập",
+    return WillPopScope(
+      onWillPop: () async => !_isPending,
+      child: Scaffold(
+        resizeToAvoidBottomPadding: true,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 60.0),
+            child: Column(
+              children: <Widget>[
+                Image.asset(
+                  "images/logoSTfarm.png",
+                  fit: BoxFit.contain,
+                ),
+                SizedBox(
+                  height: 50,
+                ),
+                Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(0.0, 15.0),
+                          blurRadius: 15.0,
                         ),
-                        focusNode: _emailFocus,
-                        onFieldSubmitted: (val) {
-                          _emailFocus.unfocus();
-                          FocusScope.of(context).requestFocus(_passwordFocus);
-                        },
-                      ),
+                        BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(0.0, -10.0),
+                          blurRadius: 10.0,
+                        )
+                      ]),
+                  child: Form(
+                    autovalidate: _autoValidate,
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        TextFormField(
+                          controller: _emailInput,
+                          validator: (val) {
+                            if (val.length == 0) return "Không được bỏ trống!";
+                            if (val.length < 5)
+                              return "Tên đăng nhập không hợp lệ";
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black12),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.green),
+                            ),
+                            filled: false,
+                            prefixIcon: Icon(Icons.account_circle),
+                            labelText: "Tên đăng nhập",
+                          ),
+                          focusNode: _emailFocus,
+                          onFieldSubmitted: (val) {
+                            _emailFocus.unfocus();
+                            FocusScope.of(context).requestFocus(_passwordFocus);
+                          },
+                        ),
 
-                      // height: ScreenUtil.getInstance().setHeight(50)),
-                      TextFormField(
-                        controller: _passWordInput,
-                        obscureText: !_showPassword,
-                        validator: (val) {
-                          if (val.length == 0) return "Không được bỏ trống!";
-                          if (val.length < 5) return "Mật khẩu quá ngắn";
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.black12)),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.green)),
-                          filled: false,
-                          prefixIcon: Icon(Icons.lock),
-                          suffixIcon: _showPasswordFnc(),
-                          labelText: "Mật khẩu",
+                        // height: ScreenUtil.getInstance().setHeight(50)),
+                        TextFormField(
+                          controller: _passWordInput,
+                          obscureText: !_showPassword,
+                          validator: (val) {
+                            if (val.length == 0) return "Không được bỏ trống!";
+                            if (val.length < 5) return "Mật khẩu quá ngắn";
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.black12)),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.green)),
+                            filled: false,
+                            prefixIcon: Icon(Icons.lock),
+                            suffixIcon: _showPasswordFnc(),
+                            labelText: "Mật khẩu",
+                          ),
+                          focusNode: _passwordFocus,
+                          onFieldSubmitted: (val) {},
+                          onEditingComplete: () {
+                            FocusScope.of(context).unfocus();
+                          },
                         ),
-                        focusNode: _passwordFocus,
-                        onFieldSubmitted: (val) {},
-                        onEditingComplete: () {
-                          FocusScope.of(context).unfocus();
-                        },
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 50,
-              ),
-              // SizedBox(height: ScreenUtil.getInstance().setHeight(50)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () async {
-                      if (_isPending) {
-                        Alert(
-                          context: context,
-                          title: 'Đang gởi...',
-                          type: AlertType.warning,
-                        ).show();
-                      } else if (_formKey.currentState.validate()) {
-                        await onLogin();
-                      } else
-                        setState(() {
-                          _autoValidate = true;
-                        });
-                    },
-                    child: Container(
-                      height: 60,
-                      width: 240,
-                      decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                              colors: [Color(0xFF17ead9), Color(0xFF6078ea)]),
-                          borderRadius: BorderRadius.circular(6.0),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Color(0xFF6078ea).withOpacity(.3),
-                                offset: Offset(0.0, 8.0),
-                                blurRadius: 8.0)
-                          ]),
-                      child: Center(
-                        child: Text(
-                          "ĐĂNG NHẬP",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: "Poppins-Bold",
-                            fontSize: 18,
-                            letterSpacing: 1.0,
+                SizedBox(
+                  height: 50,
+                ),
+                // SizedBox(height: ScreenUtil.getInstance().setHeight(50)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () async {
+                        if (_isPending) {
+                          Alert(
+                            context: context,
+                            title: 'Đang gởi...',
+                            type: AlertType.warning,
+                          ).show();
+                        } else if (_formKey.currentState.validate()) {
+                          await onLogin();
+                        } else
+                          setState(() {
+                            _autoValidate = true;
+                          });
+                      },
+                      child: Container(
+                        height: 60,
+                        width: 240,
+                        decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                                colors: [Color(0xFF17ead9), Color(0xFF6078ea)]),
+                            borderRadius: BorderRadius.circular(6.0),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Color(0xFF6078ea).withOpacity(.3),
+                                  offset: Offset(0.0, 8.0),
+                                  blurRadius: 8.0)
+                            ]),
+                        child: Center(
+                          child: Text(
+                            "ĐĂNG NHẬP",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: "Poppins-Bold",
+                              fontSize: 18,
+                              letterSpacing: 1.0,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    "Chưa có tài khoản? ",
-                    style:
-                        TextStyle(fontFamily: "Poppins-Medium", fontSize: 18.0),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RegisterPage(),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      "Đăng ký",
+                  ],
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      "Chưa có tài khoản? ",
                       style: TextStyle(
-                        color: Color(0xFF5d74e3),
-                        fontFamily: "Poppins-Bold",
-                        fontSize: 20.0,
-                      ),
+                          fontFamily: "Poppins-Medium", fontSize: 18.0),
                     ),
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 20.0,
-              )
-            ],
+                    InkWell(
+                      onTap: () {
+                        Navigator.pushReplacementNamed(
+                          context,
+                          RegisterPage.registerRoute,
+                        );
+                      },
+                      child: Text(
+                        "Đăng ký",
+                        style: TextStyle(
+                          color: Color(0xFF5d74e3),
+                          fontFamily: "Poppins-Bold",
+                          fontSize: 20.0,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 20.0,
+                )
+              ],
+            ),
           ),
         ),
       ),

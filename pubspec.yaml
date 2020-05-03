@@ -12,7 +12,7 @@ dependencies:
   http: ^0.12.0+4
   cupertino_icons: ^0.1.2
   font_awesome_flutter: ^8.5.0
-  audioplayers: ^0.14.1
+  audioplayers: 0.14.1
   url_launcher: ^5.4.2
   sleek_circular_slider: ^1.1.0
   cached_network_image: ^2.0.0
@@ -25,7 +25,7 @@ dependencies:
   dio: ^3.0.9
   multi_image_picker: ^4.6.4
   geocoder: ^0.2.1
-  image_picker: ^0.6.4
+  image_picker: 0.6.0+5
   shared_preferences: ^0.5.6+3
 
 dev_dependencies:

@@ -11,6 +11,7 @@ import 'package:shrimpapp/widgets/avatar_picker.dart';
 import 'package:shrimpapp/widgets/farmer_edit.dart';
 import 'package:shrimpapp/widgets/researcher_editor.dart';
 import 'package:shrimpapp/widgets/retailer_edit.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../validation/input_validate.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -38,7 +39,7 @@ class _RegisterPageState extends State<RegisterPage> {
   onSubmit() {
     if (_roleVal == RoleTypes.farmer) {
       onFarmer();
-    } else if (_roleVal == RoleTypes.farmer) {
+    } else if (_roleVal == RoleTypes.retailer) {
       onRetailer();
     } else if (_roleVal == RoleTypes.researcher) {
       onResearcher();
@@ -90,13 +91,25 @@ class _RegisterPageState extends State<RegisterPage> {
           content: Text('Không kết nối được với hệ thống'),
           type: AlertType.error,
         ).show();
-      } else {
-        Alert(
-          context: context,
-          title: 'Lỗi',
-          content: Text('Vui lòng thử lại sau!'),
-          type: AlertType.error,
-        ).show();
+      } else if (res.response.statusCode == 400) {
+        setState(() {
+          _accountExisted = false;
+        });
+        if (_formKey.currentState.validate())
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => ResearcherEditorWidget(
+                this._userNameCtrl.text,
+                this._passwordCtrl.text,
+                this.image,
+                cover: this.coverImage,
+              ),
+            ),
+          );
+        else
+          setState(() {
+            _autoValidate = true;
+          });
       }
     } on Exception catch (e) {
       print(e);
@@ -151,13 +164,25 @@ class _RegisterPageState extends State<RegisterPage> {
           content: Text('Không kết nối được với hệ thống'),
           type: AlertType.error,
         ).show();
-      } else {
-        Alert(
-          context: context,
-          title: 'Lỗi',
-          content: Text('Vui lòng thử lại sau!'),
-          type: AlertType.error,
-        ).show();
+      } else if (res.response.statusCode == 400) {
+        setState(() {
+          _accountExisted = false;
+        });
+        if (_formKey.currentState.validate())
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => FarmerEditorWidget(
+                this._userNameCtrl.text,
+                this._passwordCtrl.text,
+                this.image,
+                cover: this.coverImage,
+              ),
+            ),
+          );
+        else
+          setState(() {
+            _autoValidate = true;
+          });
       }
     } on Exception catch (e) {
       print(e);
@@ -198,20 +223,33 @@ class _RegisterPageState extends State<RegisterPage> {
         setState(() {
           _autoValidate = true;
         });
-    } on DioError catch (e) {
-      if (e.type == DioErrorType.CONNECT_TIMEOUT) {
+    } on DioError catch (res) {
+      if (res.type == DioErrorType.CONNECT_TIMEOUT) {
         Alert(
           context: context,
           title: 'Mất kết nối',
           content: Text('Không kết nối được với hệ thống'),
           type: AlertType.error,
         ).show();
-      } else {
-        Alert(
-          context: context,
-          title: 'Lỗi',
-          type: AlertType.error,
-        ).show();
+      } else if (res.response.statusCode == 400) {
+        setState(() {
+          _accountExisted = false;
+        });
+        if (_formKey.currentState.validate())
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => RetailerEditorWidget(
+                this._userNameCtrl.text,
+                this._passwordCtrl.text,
+                this.image,
+                cover: this.coverImage,
+              ),
+            ),
+          );
+        else
+          setState(() {
+            _autoValidate = true;
+          });
       }
     } on Exception catch (_) {
       Alert(
@@ -387,18 +425,50 @@ class _RegisterPageState extends State<RegisterPage> {
                           DropdownButton(
                             value: _roleVal,
                             onChanged: (RoleTypes newRole) {
+                              if (newRole == RoleTypes.administrator) {
+                                Alert(
+                                  context: context,
+                                  title: 'Xác nhận',
+                                  content: Text(
+                                    'Bạn muốn đăng ký thành viên Quản Lý?',
+                                  ),
+                                  type: AlertType.info,
+                                  buttons: [
+                                    DialogButton(
+                                      child: Text('Có'),
+                                      onPressed: () async {
+                                        Navigator.of(context).pop();
+                                        final url = '$kServerApiUrl/sign-up';
+                                        if (await canLaunch(url)) {
+                                          await launch(url);
+                                        }
+                                      },
+                                    ),
+                                    DialogButton(
+                                      child: Text('Không'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                ).show();
+                              }
                               setState(() {
                                 _roleVal = newRole;
                               });
                             },
+                            isExpanded: true,
                             items: [
                               RoleTypes.farmer,
                               RoleTypes.retailer,
-                              RoleTypes.researcher
+                              RoleTypes.researcher,
+                              RoleTypes.administrator,
                             ]
                                 .map(
                                   (x) => DropdownMenuItem(
-                                    child: Text(toVietnam(x)),
+                                    child: Text(
+                                      toVietnam(x),
+                                    ),
                                     value: x,
                                   ),
                                 )

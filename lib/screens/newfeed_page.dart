@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:loading_animations/loading_animations.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:provider/provider.dart';
 
 import 'package:shrimpapp/components/loading_screen.dart';
 import 'package:shrimpapp/controllers/auth_controller.dart';
-import 'package:shrimpapp/controllers/favorite_controller.dart';
 import 'package:shrimpapp/controllers/newfeed_controller.dart';
 import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/models/NewFeed.dart';
-import 'package:shrimpapp/providers/address_provider.dart';
-import 'package:shrimpapp/screens/home_page.dart';
 import 'package:shrimpapp/screens/newfeed_editor.dart';
-import 'package:shrimpapp/utils/image_to_buffer.dart';
 import 'package:shrimpapp/widgets/login_alert.dart';
 import 'package:shrimpapp/widgets/account_banner.dart';
 import 'package:shrimpapp/widgets/newfeed_item.dart';

@@ -21,8 +21,6 @@ class _AvatarPickerState extends State<AvatarPicker> {
   File coverImage;
 
   loadImageAffect(File img) {
-    print("IMAGE: ${img.path}");
-    // widget.setImage(image);
     setState(() {
       image = img;
     });
@@ -30,7 +28,6 @@ class _AvatarPickerState extends State<AvatarPicker> {
   }
 
   loadCoverImageAffect(File img) {
-    // widget.setCoverImage(img);
     setState(() {
       coverImage = img;
     });

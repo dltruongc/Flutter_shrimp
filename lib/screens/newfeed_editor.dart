@@ -73,8 +73,9 @@ class _NewFeedEditorState extends State<NewFeedEditor> {
         backgroundColor: Colors.green.shade600,
       ),
     );
+    images = resultList;
+
     setState(() {
-      images = resultList;
       _isLoading = false;
     });
   }

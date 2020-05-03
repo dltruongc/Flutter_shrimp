@@ -14,9 +14,12 @@ import '../models/ShrimpType.dart';
 class PricePage extends StatefulWidget {
   @override
   _PricePageState createState() => _PricePageState();
+
+  PricePage({Key key}) : super(key: key);
 }
 
-class _PricePageState extends State<PricePage> {
+class _PricePageState extends State<PricePage>
+    with AutomaticKeepAliveClientMixin<PricePage> {
   List<ShrimpPrice> prices;
   List<ShrimpType> shrimpTypes;
   List<ShrimpSize> shrimpSizes;
@@ -46,52 +49,41 @@ class _PricePageState extends State<PricePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     if (prices == null) {
-      ShrimpPriceController().fetchAll().then((data) {
-        prices = data;
-        setState(() {
-          prices = data;
-        });
-      });
-    }
-    if (shrimpSizes == null) {
       ShrimpSizeController().fetchAll().then((data) {
         shrimpSizes = data;
-        setState(() {
-          shrimpSizes = data;
-        });
-      });
-    }
-    if (shrimpTypes == null) {
-      ShrimpTypeController().fetchAll().then((data) {
-        shrimpTypes = data;
-        setState(() {
+        ShrimpTypeController().fetchAll().then((data) {
           shrimpTypes = data;
+          ShrimpPriceController().fetchAll().then((data) {
+            setState(() {
+              prices = data;
+            });
+          });
         });
       });
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
     if (prices == null || shrimpTypes == null || shrimpSizes == null) {
       return LoadingScreen();
     }
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(title: Text('Giá cả')),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            ...shrimpTypes.map(
-              (type) => ListViewLabel(
-                title: type.shrimpTypeName,
-                items: priceListItems(context, prices, shrimpSizes, type),
-                shows: 3,
-              ),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          ...shrimpTypes.map(
+            (type) => ListViewLabel(
+              title: type.shrimpTypeName,
+              items: priceListItems(context, prices, shrimpSizes, type),
+              shows: 3,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -155,4 +147,7 @@ class _PricePageState extends State<PricePage> {
       );
     }).toList();
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

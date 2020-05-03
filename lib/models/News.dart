@@ -29,7 +29,7 @@ class News {
     id = parsedJson['id'];
     title = parsedJson['title'];
     url = parsedJson['url'];
-    image = null;
+    image = parsedJson['image'];
     createdAt = parsedJson["updatedAt"] != null
         ? DateTime.tryParse(parsedJson["createdAt"])
         : null;

@@ -11,6 +11,7 @@ import 'package:shrimpapp/models/Account.dart';
 import 'package:shrimpapp/models/Farmer.dart';
 import 'package:shrimpapp/models/Role.dart';
 import 'package:shrimpapp/screens/login_page.dart';
+import 'package:shrimpapp/screens/register_page.dart';
 import 'package:shrimpapp/validation/input_validate.dart';
 
 class FarmerEditorWidget extends StatefulWidget {
@@ -101,13 +102,26 @@ class _FarmerEditorWidgetState extends State<FarmerEditorWidget> {
               title: 'Mất kết nối',
               type: AlertType.error,
             ).show();
-          } else
+          } else if (err.type == DioErrorType.RESPONSE) {
             Alert(
               context: context,
-              content: Text('Vui lòng thử lại sau!'),
+              content: Text(err.response.data['message']) ??
+                  'Vui lòng thử lại sau',
+              closeFunction: () {
+                Navigator.of(context).popUntil(
+                  ModalRoute.withName(RegisterPage.registerRoute),
+                );
+              },
               title: 'Lỗi',
               type: AlertType.error,
             ).show();
+          }
+          Alert(
+            context: context,
+            content: Text('Vui lòng thử lại sau!'),
+            title: 'Lỗi',
+            type: AlertType.error,
+          ).show();
         }
         setState(() {
           _isPending = false;

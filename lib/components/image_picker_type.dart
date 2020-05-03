@@ -40,11 +40,24 @@ class ChooseImage extends Alert {
                 File x = await _takeImage();
                 setImage(x);
               },
-              child: Row(
-                children: <Widget>[
-                  Icon(Icons.camera, size: 20.0),
-                  Text('Chụp ảnh mới'),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.camera, size: 20.0),
+                    SizedBox(
+                      width: 6.0,
+                    ),
+                    Text(
+                      'Chụp ảnh mới',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                      overflow: TextOverflow.fade,
+                    ),
+                  ],
+                ),
               ),
             ),
             DialogButton(
@@ -53,11 +66,24 @@ class ChooseImage extends Alert {
                 File x = await _pickImage();
                 setImage(x);
               },
-              child: Row(
-                children: <Widget>[
-                  Icon(Icons.photo, size: 20.0),
-                  Text('Có sẵn'),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.photo, size: 20.0),
+                    SizedBox(
+                      width: 6.0,
+                    ),
+                    Text(
+                      'Có sẵn',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                      overflow: TextOverflow.fade,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

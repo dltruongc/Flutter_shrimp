@@ -12,15 +12,13 @@ import 'package:shrimpapp/models/NewFeed.dart';
 import 'package:shrimpapp/providers/address_provider.dart';
 import 'package:shrimpapp/screens/environment_page.dart';
 import 'package:shrimpapp/screens/favorite_page.dart';
-import 'package:shrimpapp/screens/login_page.dart';
 import 'package:shrimpapp/screens/newfeed_page.dart';
 import 'package:shrimpapp/screens/news_page.dart';
-import 'package:shrimpapp/screens/register_page.dart';
+import 'package:shrimpapp/screens/price_page_container.dart';
 import 'package:shrimpapp/screens/weather.dart';
 import 'package:shrimpapp/utils/image_to_buffer.dart';
 import 'package:shrimpapp/widgets/login_alert.dart';
 import 'package:shrimpapp/widgets/audio_player.dart';
-import 'package:shrimpapp/screens/price_page.dart';
 
 class MyApp extends StatefulWidget {
   static const String route = '/myapp';
@@ -154,29 +152,29 @@ class HomePage extends StatelessWidget {
                 ),
                 child: Column(
                   children: <Widget>[
-                    Container(
-                      child: RaisedButton(
-                          child: Text("RegisterPage"),
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    RegisterPage(),
-                              ),
-                            );
-                          }),
-                    ),
-                    Container(
-                      child: RaisedButton(
-                          child: Text("LoginPage"),
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (BuildContext context) => LoginPage(),
-                              ),
-                            );
-                          }),
-                    ),
+//                    Container(
+//                      child: RaisedButton(
+//                          child: Text("RegisterPage"),
+//                          onPressed: () {
+//                            Navigator.of(context).push(
+//                              MaterialPageRoute(
+//                                builder: (BuildContext context) =>
+//                                    RegisterPage(),
+//                              ),
+//                            );
+//                          }),
+//                    ),
+//                    Container(
+//                      child: RaisedButton(
+//                          child: Text("LoginPage"),
+//                          onPressed: () {
+//                            Navigator.of(context).push(
+//                              MaterialPageRoute(
+//                                builder: (BuildContext context) => LoginPage(),
+//                              ),
+//                            );
+//                          }),
+//                    ),
                     Expanded(
                       child: Row(
                         children: <Widget>[
@@ -256,7 +254,8 @@ class HomePage extends StatelessWidget {
                               onPress: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                      builder: (context) => PricePage()),
+                                      builder: (context) =>
+                                          PricePageContainer()),
                                 );
                               },
                             ),

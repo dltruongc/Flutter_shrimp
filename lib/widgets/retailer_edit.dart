@@ -54,9 +54,7 @@ class _RetailerEditorWidgetState extends State<RetailerEditorWidget> {
         coverPhoto: widget.cover != null
             ? base64Encode(widget.cover.readAsBytesSync())
             : null,
-        researcher: null,
-        role: RoleTypes.farmer,
-        farmer: null,
+        role: RoleTypes.retailer,
         retailer: Retailer(
           cityName: _cityCtrl.text
               .split(' ')

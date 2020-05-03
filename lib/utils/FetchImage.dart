@@ -7,11 +7,13 @@ import 'package:shrimpapp/utils/ServerAddress.dart';
 import '../constants.dart';
 
 class MyNetworkImage {
-  static CachedNetworkImage fromPath(
-      {@required String path,
-      String errorMessage = 'Không tải được!',
-      height = 200.0,
-      width = double.infinity}) {
+  static CachedNetworkImage fromPath({
+    @required String path,
+    String errorMessage = 'Không tải được!',
+    num height = 200.0,
+    num width = double.infinity,
+    BoxFit fit = BoxFit.cover,
+  }) {
     String url;
 
     if (path.startsWith("/")) {
@@ -32,7 +34,7 @@ class MyNetworkImage {
       ),
       imageUrl: url,
       width: double.infinity,
-      fit: BoxFit.cover,
+      fit: fit,
       height: height,
     );
   }

@@ -17,9 +17,12 @@ class NewFeedItem extends StatefulWidget {
   final Account owner;
 
   // FIXME: owner feed item null error
-  NewFeedItem(
-      {Key key, @required this.newFeed, @required this.owner, like = false})
-      : super(key: key);
+  NewFeedItem({
+    Key key,
+    @required this.newFeed,
+    @required this.owner,
+    like = false,
+  }) : super(key: key);
 
   @override
   _NewFeedItemState createState() => _NewFeedItemState();
@@ -163,7 +166,9 @@ class _NewFeedItemState extends State<NewFeedItem> {
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => CommentPage(widget.newFeed),
+                        builder: (context) => CommentPage(
+                          widget.newFeed,
+                        ),
                       ),
                     );
                   },
@@ -177,19 +182,22 @@ class _NewFeedItemState extends State<NewFeedItem> {
                     style: TextStyle(color: Colors.black),
                   ),
                 ),
-                FlatButton.icon(
-                  padding: const EdgeInsets.all(0.0),
-                  onPressed: () {},
-                  icon: Icon(
-                    FontAwesomeIcons.share,
-                    size: 20.0,
-                    color: Colors.black54,
-                  ),
-                  label: Text(
-                    'Chia sẻ',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
+                // TODO: DELETE newFeed implement
+                // loginAccount.id == widget.newFeed.accountId
+                //     ? FlatButton.icon(
+                //         padding: const EdgeInsets.all(0.0),
+                //         onPressed: () {},
+                //         icon: Icon(
+                //           FontAwesomeIcons.trashAlt,
+                //           size: 20.0,
+                //           color: Colors.red,
+                //         ),
+                //         label: Text(
+                //           'Xóa',
+                //           style: TextStyle(color: Colors.black),
+                //         ),
+                //       )
+                //     : SizedBox(),
               ],
             ),
           ),

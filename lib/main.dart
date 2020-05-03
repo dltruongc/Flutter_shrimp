@@ -7,6 +7,7 @@ import 'package:shrimpapp/controllers/favorite_controller.dart';
 import 'package:shrimpapp/controllers/newfeed_controller.dart';
 import 'package:shrimpapp/constants.dart';
 import 'package:shrimpapp/screens/home_page.dart';
+import 'package:shrimpapp/screens/register_page.dart';
 import 'package:shrimpapp/splash_screen.dart';
 
 void main() {
@@ -30,8 +31,10 @@ void main() {
             routes: {
               HomePage.route: (context) => HomePage(),
               MyApp.route: (context) => MyApp(),
+              RegisterPage.registerRoute: (context) => RegisterPage(),
             },
             home: SplashScreen(),
+            debugShowCheckedModeBanner: false,
             theme: ThemeData(
               iconTheme: new IconThemeData(
                 color: Colors.white,

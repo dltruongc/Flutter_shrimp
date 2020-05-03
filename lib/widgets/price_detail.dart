@@ -45,7 +45,7 @@ class _DetailPriceUIState extends State<DetailPrice> {
       padding: const EdgeInsets.fromLTRB(24, 6, 6, 6),
       color: Color(0xFFECFCFE),
       child: Text(
-        '${price.shrimpPriceDate.day}-${price.shrimpPriceDate.month}-${price.shrimpPriceDate.year}',
+        'Ngày ${price.shrimpPriceDate.day} tháng ${price.shrimpPriceDate.month}, ${price.shrimpPriceDate.year}',
         style: TextStyle(
             color: Color(
               0xFF14808C,

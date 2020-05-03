@@ -65,8 +65,14 @@ class Account {
             : null,
         this._password = null,
         this.role = Role.fromInt(parsedJson['roleId']),
-        this.profilePhoto = parsedJson['profilePhoto'],
-        this.coverPhoto = parsedJson['coverPhoto'],
+        this.profilePhoto = parsedJson['profilePhoto'] != null &&
+                parsedJson['profilePhoto'].isNotEmpty
+            ? parsedJson['profilePhoto']
+            : null,
+        this.coverPhoto = parsedJson['coverPhoto'] != null &&
+                parsedJson['coverPhoto'].isNotEmpty
+            ? parsedJson['coverPhoto']
+            : null,
         createdAt = parsedJson["updatedAt"] != null
             ? DateTime.tryParse(parsedJson["createdAt"])
             : null,
@@ -106,8 +112,8 @@ class Account {
       'updatedAt': updatedAt,
       'isMale': isMale,
       'birth': birth,
-      'profilePhoto': profilePhoto,
-      'coverPhoto': coverPhoto,
+      'profilePhoto': profilePhoto ?? '',
+      'coverPhoto': coverPhoto ?? '',
       'roleId': role.toInt(),
       'retailer': retailer != null ? retailer.toMap() : null,
       'farmer': farmer != null ? farmer.toMap() : null,

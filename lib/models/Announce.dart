@@ -8,7 +8,8 @@ class Announce {
   Announce.fromMap(Map<String, dynamic> parsedJson) {
     this.id = parsedJson['_id'];
     this.accountId = parsedJson['accountId'];
-    this.favorites = List<String>.from(parsedJson['favorites']);
+    this.favorites =
+        List<String>.from(parsedJson['favorites']).reversed.toList();
   }
 
   getItems({int limit = 10, int page = 1}) {

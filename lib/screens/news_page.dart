@@ -4,6 +4,7 @@ import 'package:loading_animations/loading_animations.dart';
 import 'package:shrimpapp/components/loading_screen.dart';
 import 'package:shrimpapp/controllers/news_controller.dart';
 import 'package:shrimpapp/models/News.dart';
+import 'package:shrimpapp/utils/FetchImage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class NewsPage extends StatefulWidget {
@@ -71,8 +72,13 @@ class _NewsPageState extends State<NewsPage> {
       appBar: AppBar(
         title: Text('Tin tức'),
       ),
-      body: ListView.builder(
+      body: ListView.separated(
         itemCount: _hasMore ? newsData.length + 1 : newsData.length,
+        separatorBuilder: (ctx, id) => Divider(
+          thickness: 1.3,
+          indent: 32,
+          endIndent: 32,
+        ),
         itemBuilder: (ctx, id) {
           _launchURL() async {
             final url = newsData[id].url;
@@ -91,19 +97,29 @@ class _NewsPageState extends State<NewsPage> {
           return GestureDetector(
             onTap: _launchURL,
             child: ListTile(
-              leading: Container(
-                margin: EdgeInsets.all(8.0),
-                height: 40,
-                width: 40,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: newsData[id].image != null
-                        ? MemoryImage(base64Decode(newsData[id].image))
-                        : AssetImage('images/ts_blue.png'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
+              leading: newsData[id].image != null
+                  ? Container(
+                      margin: const EdgeInsets.all(2.0),
+                      height: 80.0,
+                      width: 80.0,
+                      child: MyNetworkImage.fromPath(
+                        path: newsData[id].image,
+                        height: 60.0,
+                        width: 60.0,
+                        fit: BoxFit.fill,
+                      ),
+                    )
+                  : Container(
+                      margin: EdgeInsets.all(8.0),
+                      height: 80.0,
+                      width: 80.0,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: AssetImage('images/ts_blue.png'),
+                        ),
+                      ),
+                    ),
               title: Text(
                 newsData[id].title,
                 style: TextStyle(fontWeight: FontWeight.w500),

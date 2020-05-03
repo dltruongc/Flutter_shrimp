@@ -186,8 +186,8 @@ class _EnvironmentPageState extends State<EnvironmentPage> {
 
             // right
             Paragraph(
-              title: 'Trạm đo:',
-              items: ['${sensor.name}'],
+              title: 'Trạng thái:',
+              items: [sensor.value <= 0.5 ? 'Bình thường' : (sensor.value > 0.5 && sensor.value <= 4 ) ? 'Mặn': 'Rất mặn'],
             ),
           ],
         ),

@@ -21,6 +21,7 @@ import 'package:shrimpapp/widgets/slider_images.dart';
 class CommentPage extends StatefulWidget {
   final NewFeed newFeed;
   final CommentController commentController = CommentController();
+
   CommentPage(this.newFeed);
 
   @override
@@ -66,6 +67,8 @@ class _CommentPageState extends State<CommentPage> {
     TextEditingController cmtController = TextEditingController();
     final Account owner =
         Provider.of<AuthController>(context, listen: false).owner;
+    ScrollController _controller = ScrollController();
+
     Future _onSubmit() async {
       Comment newComment = Comment(
         images: [],
@@ -107,9 +110,13 @@ class _CommentPageState extends State<CommentPage> {
 
           setState(() {
             comments.add(newComment);
+            _controller.jumpTo(_controller.position.maxScrollExtent);
+            cmtController.clear();
           });
         }
       } catch (err) {
+        print(err);
+
         Alert(
                 context: context,
                 title: 'Lỗi',
@@ -134,6 +141,7 @@ class _CommentPageState extends State<CommentPage> {
         child: Stack(
           children: <Widget>[
             ListView(
+              controller: _controller,
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               children: <Widget>[
                 AccountBar(
@@ -268,6 +276,7 @@ class _CommentPageState extends State<CommentPage> {
                   ).show();
                 } else {
                   _onSubmit();
+                  _focusNode.unfocus();
                 }
               },
             ),
